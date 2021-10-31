@@ -16,7 +16,7 @@
             "request": "launch",
             "mainClass": "ManagementProgramProj.Main.src.App",
             "projectName": "Manement Program_fef45d35",
-            "vmArgs": "--module-path \"E:/Side Programming/Java/Manement Program/javafx-sdk-17.0.1/lib\" --add-modules=javafx.controls,javafx.fxml"
+            "vmArgs": "--module-path \"./javafx-sdk-17.0.1/lib\" --add-modules=javafx.controls,javafx.fxml"
         }
     ]
 }
