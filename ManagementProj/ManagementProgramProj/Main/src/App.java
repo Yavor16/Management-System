@@ -14,6 +14,7 @@ public class App extends Application {
     @Override
     public void start(Stage stage) throws Exception{
         DBConnection.Connect();
+        DBConnection.GetProducts();
         try{
             Parent root = FXMLLoader.load(getClass().getResource("./Scenes/OpenScene.fxml"));
             Scene scene = new Scene(root);

@@ -15,10 +15,10 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
-import javafx.stage.Stage;
 import javafx.scene.Node;
-public class AddProductController implements Initializable {
+import javafx.stage.Stage;
 
+public class EditProductController implements Initializable{
     @FXML
     TextField nameText;
     @FXML
@@ -27,49 +27,41 @@ public class AddProductController implements Initializable {
     TextField priceText;
     @FXML
     ComboBox<String> categoryComboBox;
+    ObservableList<String> comboBoxItems = FXCollections.observableArrayList("Fruits", "Vegetables", "Meat", "Alcohol");
+
+    ProductModel selectedProd = AdminMainSceneController.selectedProduct; 
 
     String selectedCategory;
-    
+
+    ProductModel productToAdd;
+
+    int selectedProductID = AdminMainSceneController.listOfProducts.indexOf(selectedProd);
+
     @Override
     public void initialize(URL url, ResourceBundle rb){
-        ObservableList<String> comboBoxItems = FXCollections.observableArrayList("Fruits", "Vegetables", "Meat", "Alcohol");
+        nameText.setText(selectedProd.GetName());
+        quantityText.setText(String.valueOf(selectedProd.GetQuantity()));
+        priceText.setText(String.valueOf(selectedProd.GetPrice()));
         categoryComboBox.setItems(comboBoxItems);
-        System.out.println(GetLastIndex());
-
+        categoryComboBox.setValue(selectedProd.GetCategory());
     }
-    
-    public void addProduct(ActionEvent e) throws SQLException{
-        CheckComboBoxInput();
+    public void UpdateProduct(ActionEvent e) throws SQLException {
         try{
             float price = Float.parseFloat(priceText.getText());
             int quantity = Integer.parseInt(quantityText.getText());
             selectedCategory = categoryComboBox.getValue().toString();
-            DBConnection.AddProduct(GetLastIndex(), nameText.getText(), selectedCategory, price, quantity);
+           
+            DBConnection.UpdateProduct(selectedProd.GetID(), nameText.getText(), selectedCategory, price , quantity);
+            AdminMainSceneController.listOfProducts.remove(selectedProductID);
             
-            AdminMainSceneController.listOfProducts.add(new ProductModel(GetLastIndex(), nameText.getText(), selectedCategory, quantity, price));
-
-            JOptionPane.showMessageDialog(null, "Product added!");
-
+            AdminMainSceneController.listOfProducts.add(selectedProductID,
+             new ProductModel(selectedProd.GetID(), nameText.getText(), selectedCategory, quantity , price)
+            );
             Stage stage = (Stage)((Node)e.getSource()).getScene().getWindow();
             stage.close();
         }
         catch(Exception exe){
             JOptionPane.showMessageDialog(null, exe.getMessage());
         }
-    }
-    private void CheckComboBoxInput(){
-        try{
-              selectedCategory = categoryComboBox.getValue().toString();
-        }
-        catch(Exception exe){
-            JOptionPane.showMessageDialog(null, exe.getMessage());
-        }
-    }
-
-    int GetLastIndex(){
-        Object key =DBConnection.product.keySet().toArray()[DBConnection.product.size() - 1]; 
-
-        int id = DBConnection.product.get(key).GetID();
-        return id + 1;
     }
 }
