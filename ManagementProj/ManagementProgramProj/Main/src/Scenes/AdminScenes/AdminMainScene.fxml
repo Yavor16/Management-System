@@ -6,11 +6,11 @@
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="250.0" prefWidth="713.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ManagementProgramProj.Main.src.Controllers.AdminSceneControllers.AdminMainSceneController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="250.0" minWidth="713.0" prefHeight="267.0" prefWidth="713.0" style="-fx-background-color: #333;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ManagementProgramProj.Main.src.Controllers.AdminSceneControllers.AdminMainSceneController">
    <children>
-      <Button fx:id="openAddScenetBttn" layoutX="550.0" layoutY="25.0" mnemonicParsing="false" onAction="#OpenAddProductScene" prefHeight="29.0" prefWidth="139.0" text="Add Product" />
-      <Button fx:id="deleteBttn" layoutX="550.0" layoutY="65.0" mnemonicParsing="false" onAction="#DeleteProduct" prefHeight="29.0" prefWidth="139.0" text="Delete Product" />
-      <TableView fx:id="productsTableView" layoutX="48.0" layoutY="25.0" prefHeight="200.0" prefWidth="482.0">
+      <Button fx:id="openAddScenetBttn" layoutX="550.0" layoutY="25.0" mnemonicParsing="false" onAction="#OpenAddProductScene" prefHeight="29.0" prefWidth="139.0" style="-fx-background-color: Gray; -fx-text-fill: White; -fx-font-size: 16;" text="Add Product" />
+      <Button fx:id="deleteBttn" layoutX="550.0" layoutY="65.0" mnemonicParsing="false" onAction="#DeleteProduct" prefHeight="29.0" prefWidth="139.0" style="-fx-background-color: Gray; -fx-text-fill: White; -fx-font-size: 16;" text="Delete Product" />
+      <TableView fx:id="productsTableView" layoutX="48.0" layoutY="25.0" prefHeight="200.0" prefWidth="482.0" style="-fx-background-color: Gray;">
         <columns>
           <TableColumn fx:id="nameTableCol" maxWidth="120.0" prefWidth="120.0" resizable="false" text="Name" />
           <TableColumn fx:id="quantityTableCol" maxWidth="120.0" prefWidth="120.0" resizable="false" text="Quantity" />
@@ -18,7 +18,8 @@
             <TableColumn fx:id="priceTableCol" maxWidth="120.0" minWidth="1.0" prefWidth="120.0" resizable="false" text="Price" />
         </columns>
       </TableView>
-      <Button fx:id="editBttn" layoutX="550.0" layoutY="104.0" mnemonicParsing="false" onAction="#OpenEditProductScene" prefHeight="29.0" prefWidth="139.0" text="Edit Product" />
-      <ComboBox fx:id="searchComboBox" layoutX="551.0" layoutY="142.0" onAction="#SearchUsingComboBox" prefHeight="25.0" prefWidth="139.0" promptText="Search Category" />
+      <Button fx:id="editBttn" layoutX="550.0" layoutY="104.0" mnemonicParsing="false" onAction="#OpenEditProductScene" prefHeight="29.0" prefWidth="139.0" style="-fx-background-color: Gray; -fx-text-fill: White; -fx-font-size: 16;" text="Edit Product" />
+      <ComboBox fx:id="searchComboBox" layoutX="551.0" layoutY="142.0" onAction="#SearchUsingComboBox" prefHeight="25.0" prefWidth="139.0" promptText="Search Category" style="-fx-background-color: Gray;" />
+      <Button fx:id="closeWindowBttn" layoutX="14.0" layoutY="228.0" mnemonicParsing="false" onAction="#CloseWindow" style="-fx-background-color: Gray; -fx-text-fill: White; -fx-font-size: 16;" text="Back" />
    </children>
 </AnchorPane>

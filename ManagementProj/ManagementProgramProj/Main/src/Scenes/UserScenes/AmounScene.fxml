@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.text.Font?>
+
+<TextField fx:id="amountTextField" alignment="CENTER_RIGHT" onAction="#SetAmount" promptText="Amount" style="-fx-background-color: #999; -fx-border-radius: 3; -fx-border-color: White; -fx-border-width: 2;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ManagementProgramProj.Main.src.Controllers.UserSceneControllers.UserAmountScene">
+   <font>
+      <Font size="16.0" />
+   </font>
+</TextField>

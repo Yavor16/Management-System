@@ -23,7 +23,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-
+import javafx.scene.Node;
 public class AdminMainSceneController implements Initializable{
 
     private Stage stage;
@@ -52,6 +52,8 @@ public class AdminMainSceneController implements Initializable{
     Button editBttn;
     @FXML
     Button deleteBttn;
+    @FXML
+    Button closeWindowBttn;
     @FXML
     ComboBox<String> searchComboBox;
     /************************************/
@@ -91,14 +93,16 @@ public class AdminMainSceneController implements Initializable{
     }
     void UpdateTableView() throws SQLException{
         DBConnection.GetProducts();
+        if (!searchComboBox.getSelectionModel().isEmpty()){
 
-        if (searchComboBox.getValue().toString() == "Don't search"){
-            productsTableView.setItems(listOfProducts);
+            if (searchComboBox.getValue().toString() == "Don't search" ){
+                productsTableView.setItems(listOfProducts);
+            }
+            else{
+                productsTableView.setItems(GetComboBoxSearchResults());
+            }
+            productsTableView.refresh();
         }
-        else{
-            productsTableView.setItems(GetComboBoxSearchResults());
-        }
-        productsTableView.refresh();
     }
     Scene CreateScene(String fileName) throws IOException{
         url = new File("ManagementProgramProj/Main/src/Scenes/AdminScenes/" + fileName + ".fxml").toURI().toURL();
@@ -112,9 +116,17 @@ public class AdminMainSceneController implements Initializable{
     }
     public void SearchUsingComboBox(ActionEvent e) throws SQLException{
         UpdateTableView();
-
     }
-  
+    public void CloseWindow(ActionEvent e) throws IOException{
+        url = new File("ManagementProgramProj/Main/src/Scenes/OpenScene.fxml").toURI().toURL();
+        
+        root = FXMLLoader.load(url);
+
+        stage = (Stage)((Node )e.getSource()).getScene().getWindow();
+        scene = new Scene(root);
+        stage.setScene(scene);
+        stage.show();
+    }
     ObservableList<ProductModel> GetComboBoxSearchResults(){
         ObservableList<ProductModel> searchResultList = FXCollections.observableArrayList();
 

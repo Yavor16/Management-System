@@ -1,16 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ManagementProgramProj.Main.src.Controller">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #333;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ManagementProgramProj.Main.src.Controllers.UserSceneControllers.UserMainScene">
    <children>
-      <Label layoutX="236.0" layoutY="164.0" text="Buy Product">
+      <TableView fx:id="productsTableView" layoutX="104.0" layoutY="14.0" prefHeight="200.0" prefWidth="482.0" style="-fx-background-color: Gray;">
+         <columns>
+            <TableColumn fx:id="nameTableCol" maxWidth="120.0" prefWidth="120.0" resizable="false" text="Name" />
+            <TableColumn fx:id="quantityTableCol" maxWidth="120.0" prefWidth="120.0" resizable="false" text="Quantity" />
+            <TableColumn fx:id="categoryTableCol" maxWidth="120.0" prefWidth="120.0" resizable="false" text="Category" />
+            <TableColumn fx:id="priceTableCol" maxWidth="120.0" minWidth="1.0" prefWidth="120.0" resizable="false" text="Price" />
+         </columns>
+      </TableView>
+      <TableView fx:id="buyProductsTableView" layoutX="212.0" layoutY="233.0" prefHeight="122.0" prefWidth="362.0" style="-fx-background-color: Gray;">
+        <columns>
+          <TableColumn fx:id="buyProdNameCol" prefWidth="90.0" resizable="false" text="Name" />
+          <TableColumn fx:id="buyProdQuantityCol" prefWidth="90.0" resizable="false" text="Quantity" />
+            <TableColumn fx:id="buyProdPriceCol" prefWidth="90.0" resizable="false" text="Price" />
+            <TableColumn fx:id="buyProdAmountCol" prefWidth="90.0" text="Amount" />
+        </columns>
+      </TableView>
+      <Button fx:id="addToProdTableBttn" layoutX="14.0" layoutY="233.0" mnemonicParsing="false" onAction="#AddItemToProductTable" prefHeight="35.0" prefWidth="168.0" style="-fx-background-color: Gray; -fx-font-size: 16; -fx-text-fill: White;" text="Add to Basket">
          <font>
-            <Font size="24.0" />
+            <Font size="16.0" />
          </font>
-      </Label>
+      </Button>
+      <Button fx:id="removeFromProdTableBttn" layoutX="14.0" layoutY="283.0" mnemonicParsing="false" onAction="#RemoveItemFromProductTable" style="-fx-background-color: Gray; -fx-font-size: 16; -fx-text-fill: White;" text="Remove from Basket">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </Button>
+      <Button fx:id="buyBttn" layoutX="14.0" layoutY="331.0" mnemonicParsing="false" onAction="#BuyProducts" prefHeight="35.0" prefWidth="168.0" style="-fx-background-color: Gray; -fx-font-size: 16; -fx-text-fill: White;" text="BUY">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </Button>
+      <Button fx:id="closeWindowBttn" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" onAction="#CloseWindow" style="-fx-background-color: Gray; -fx-text-fill: White; -fx-font-size: 16;" text="Back" />
    </children>
 </AnchorPane>

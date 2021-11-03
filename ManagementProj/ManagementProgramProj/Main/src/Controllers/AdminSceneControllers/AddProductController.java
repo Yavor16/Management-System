@@ -35,7 +35,6 @@ public class AddProductController implements Initializable {
         ObservableList<String> comboBoxItems = FXCollections.observableArrayList("Fruits", "Vegetables", "Meat", "Alcohol");
         categoryComboBox.setItems(comboBoxItems);
         System.out.println(GetLastIndex());
-
     }
     
     public void addProduct(ActionEvent e) throws SQLException{
