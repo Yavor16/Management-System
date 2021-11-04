@@ -2,8 +2,8 @@ package ManagementProgramProj.Main.src.Controllers.UserSceneControllers;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
+import java.sql.SQLException;
 import java.util.ResourceBundle;
 
 import javax.swing.JOptionPane;
@@ -76,13 +76,17 @@ public class UserMainScene implements Initializable{
         listOfProducts = FXCollections.observableArrayList();
         listOfProductsToBuy = FXCollections.observableArrayList();
         
-        AddDataToTableView();
+        try {
+            AddDataToTableView();
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, e.getMessage());
+        }
         AddDataToBuyTableView();
         
         removeFromProdTableBttn.disableProperty().bind(Bindings.isEmpty(buyProductsTableView.getSelectionModel().getSelectedItems()));
         addToProdTableBttn.disableProperty().bind(Bindings.isEmpty(productsTableView.getSelectionModel().getSelectedItems()));
     }
-    void AddDataToTableView(){
+    void AddDataToTableView() throws SQLException{
         for(var prod : DBConnection.product.entrySet()){
             listOfProducts.add(prod.getValue());
         }
@@ -151,9 +155,39 @@ public class UserMainScene implements Initializable{
             }
 
     }
+    void CheckAndAddProductToBuyList(int  indexOfIteminList, ItemToBuyModel chosenItemFromBuyList){
+            ProductModel newProdToList = new ProductModel(chosenItemFromBuyList.GetProduct().GetID(),
+                                                        chosenItemFromBuyList.GetProduct().GetName(), 
+                                                        chosenItemFromBuyList.GetProduct().GetCategory(), 
+                                                        amountToBuy, 
+                                                        chosenItemFromBuyList.GetProduct().GetPrice()); 
+
+            if(DoesBuyListContainsItem(newProdToList)){
+                listOfProducts.forEach(x->{
+                    if(x.GetName() == newProdToList.GetName()){
+                        x.SetQuantity(x.GetQuantity() + amountToBuy);
+                    }
+                });
+                
+                listOfProductsToBuy.get(indexOfIteminList).GetProduct().SetQuantity(chosenItemFromBuyList.GetProduct().GetQuantity() - amountToBuy);
+            }
+            else{   
+                listOfProducts.add(newProdToList);
+                listOfProductsToBuy.get(indexOfIteminList).GetProduct().SetQuantity(chosenItemFromBuyList.GetProduct().GetQuantity() - amountToBuy);
+            }
+
+    }
     Boolean DoesListContainsItem(ItemToBuyModel productModeBuyModel){
         for(int i = 0; i < listOfProductsToBuy.size(); i++){
             if (listOfProductsToBuy.get(i).GetProduct().GetName().equals(productModeBuyModel.GetProduct().GetName())){
+                return true;
+            }
+        }
+        return false;
+    }
+    Boolean DoesBuyListContainsItem(ProductModel productModeBuyModel){
+        for (int i = 0; i < listOfProducts.size(); i++) {
+            if (listOfProducts.get(i).GetName().equals(productModeBuyModel.GetName())) {
                 return true;
             }
         }
@@ -178,10 +212,56 @@ public class UserMainScene implements Initializable{
         productsTableView.refresh();
     }
     
-    public void RemoveItemFromProductTable(ActionEvent e){
+    public void RemoveItemFromProductTable(ActionEvent e) throws IOException{
+        ItemToBuyModel selectedProductFromBuyList = buyProductsTableView.getSelectionModel().getSelectedItem(); 
+        CreateAmountScene();
         
+        int indexOfIteminList = listOfProductsToBuy.indexOf(selectedProductFromBuyList); 
+        ItemToBuyModel chosenItemFromList = listOfProductsToBuy.get(indexOfIteminList);
+
+        if(chosenItemFromList.GetProduct().GetQuantity() - amountToBuy < 0){
+            JOptionPane.showMessageDialog(null, "Not enough items");
+        }
+        else if(chosenItemFromList.GetProduct().GetQuantity() - amountToBuy == 0){
+
+            CheckAndAddProductToBuyList(indexOfIteminList, chosenItemFromList);
+
+            listOfProductsToBuy.remove(indexOfIteminList);
+            UpdateBuyProductsTable();
+            UpdateProductsTable();
+        }
+        else{
+            CheckAndAddProductToBuyList(indexOfIteminList, chosenItemFromList);
+            UpdateBuyProductsTable();
+            UpdateProductsTable();
+        }
     }
-    public void BuyProducts(ActionEvent e){
+    public void BuyProducts(ActionEvent e) throws SQLException{
+        DBConnection.GetProducts();
+
+        ItemToBuyModel prod;
+        ProductModel prodFromDB;
+        
+        int listSize = listOfProductsToBuy.size();
+
+        for (int i = 0; i < listSize; i++) {   
+            prod = listOfProductsToBuy.get(i);
+            prodFromDB = DBConnection.product.get(prod.GetProduct().GetID());
+            
+            if (prodFromDB.GetQuantity() - prod.GetProduct().GetQuantity() > 0) {
+                DBConnection.UpdateProduct(prod.GetProduct().GetID(), 
+                                            prod.GetProduct().GetName(), 
+                                            prod.GetProduct().GetCategory(), 
+                                            prod.GetProduct().GetPrice(), 
+                                            prodFromDB.GetQuantity() - prod.GetProduct().GetQuantity());
+            }
+            else{
+                DBConnection.DeleteProduct(prod.GetProduct().GetID());
+            }
+        }
+        listOfProductsToBuy.clear();
+        UpdateBuyProductsTable();
+        UpdateProductsTable();
     }
     public void CloseWindow(ActionEvent e) throws IOException{
         URL url = new File("ManagementProgramProj/Main/src/Scenes/OpenScene.fxml").toURI().toURL();

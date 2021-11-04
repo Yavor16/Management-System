@@ -34,7 +34,6 @@ public class AddProductController implements Initializable {
     public void initialize(URL url, ResourceBundle rb){
         ObservableList<String> comboBoxItems = FXCollections.observableArrayList("Fruits", "Vegetables", "Meat", "Alcohol");
         categoryComboBox.setItems(comboBoxItems);
-        System.out.println(GetLastIndex());
     }
     
     public void addProduct(ActionEvent e) throws SQLException{
@@ -64,11 +63,13 @@ public class AddProductController implements Initializable {
             JOptionPane.showMessageDialog(null, exe.getMessage());
         }
     }
-
+    //Object key;
     int GetLastIndex(){
-        Object key =DBConnection.product.keySet().toArray()[DBConnection.product.size() - 1]; 
-
-        int id = DBConnection.product.get(key).GetID();
-        return id + 1;
+        int id = 0;
+        if (!DBConnection.product.isEmpty()) {
+            Object key = DBConnection.product.keySet().toArray()[DBConnection.product.size() - 1]; 
+            id = DBConnection.product.get(key).GetID() + 1;
+        }
+        return id;
     }
 }

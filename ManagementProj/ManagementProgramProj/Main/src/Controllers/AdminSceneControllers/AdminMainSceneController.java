@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.ResourceBundle;
-
 import ManagementProgramProj.Main.src.DBConnection;
 import ManagementProgramProj.Main.src.ProductModel;
 import javafx.beans.binding.Bindings;

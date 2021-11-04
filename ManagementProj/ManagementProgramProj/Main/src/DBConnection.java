@@ -11,6 +11,7 @@ import java.util.Properties;
 import javax.swing.JOptionPane;
 
 public class DBConnection {
+    
     static Connection dbConnection = null;
     static PreparedStatement pst;
     
