@@ -5,7 +5,7 @@ public class ProductModel {
     private final String name;
     private final String category;
     private int quantity;
-    private final float price;
+    private float price;
 
     public ProductModel(int id, String name, String category, int quantity, float price) {
         this.id= id;
@@ -32,5 +32,8 @@ public class ProductModel {
     }
     public void SetQuantity(int quantity){
         this.quantity = quantity;
+    }
+    public final void SetPrice(float price){
+        this.price = price;
     }
 }

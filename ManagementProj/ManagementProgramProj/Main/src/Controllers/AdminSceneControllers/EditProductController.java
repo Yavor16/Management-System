@@ -13,8 +13,10 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Alert;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.Node;
 import javafx.stage.Stage;
 
@@ -44,6 +46,8 @@ public class EditProductController implements Initializable{
         priceText.setText(String.valueOf(selectedProd.GetPrice()));
         categoryComboBox.setItems(comboBoxItems);
         categoryComboBox.setValue(selectedProd.GetCategory());
+
+        nameText.setDisable(true);
     }
     public void UpdateProduct(ActionEvent e) throws SQLException {
         try{
@@ -57,11 +61,20 @@ public class EditProductController implements Initializable{
             AdminMainSceneController.listOfProducts.add(selectedProductID,
              new ProductModel(selectedProd.GetID(), nameText.getText(), selectedCategory, quantity , price)
             );
+            Alert alert = new Alert(AlertType.INFORMATION);
+            alert.setTitle("Update");
+            alert.setHeaderText("");
+            alert.setContentText(selectedProd.GetName() + " updated!");
+            alert.showAndWait();
             Stage stage = (Stage)((Node)e.getSource()).getScene().getWindow();
             stage.close();
         }
         catch(Exception exe){
             JOptionPane.showMessageDialog(null, exe.getMessage());
         }
+    }
+    public void CancelProduct(ActionEvent e ){
+        Stage stage = (Stage)((Node)e.getSource()).getScene().getWindow();
+        stage.close();
     }
 }

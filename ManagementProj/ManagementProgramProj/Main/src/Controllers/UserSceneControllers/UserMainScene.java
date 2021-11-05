@@ -22,9 +22,12 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.scene.Node;
@@ -62,12 +65,13 @@ public class UserMainScene implements Initializable{
     Button buyBttn;
     @FXML
     Button closeWindowBttn;
-
-
+    @FXML
+    Label totalMoneyLabel;
+    static Alert alert = new Alert(AlertType.INFORMATION);
     public ProductModel selectedProduct;
     public static int amountToBuy;
-    ItemToBuyModel newProdToBuy;
-    
+    float totalMoney = 0;
+
     static ObservableList<ProductModel> listOfProducts;
     ObservableList<ItemToBuyModel>listOfProductsToBuy;
     
@@ -76,17 +80,18 @@ public class UserMainScene implements Initializable{
         listOfProducts = FXCollections.observableArrayList();
         listOfProductsToBuy = FXCollections.observableArrayList();
         
+        totalMoneyLabel.setText("0.0");
         try {
-            AddDataToTableView();
+            InitializeTableView();
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null, e.getMessage());
         }
-        AddDataToBuyTableView();
-        
+        InitializeBuyTableView();
         removeFromProdTableBttn.disableProperty().bind(Bindings.isEmpty(buyProductsTableView.getSelectionModel().getSelectedItems()));
         addToProdTableBttn.disableProperty().bind(Bindings.isEmpty(productsTableView.getSelectionModel().getSelectedItems()));
+        buyBttn.disableProperty().bind(Bindings.isEmpty(listOfProductsToBuy));
     }
-    void AddDataToTableView() throws SQLException{
+    void InitializeTableView() throws SQLException{
         for(var prod : DBConnection.product.entrySet()){
             listOfProducts.add(prod.getValue());
         }
@@ -98,7 +103,7 @@ public class UserMainScene implements Initializable{
       
         productsTableView.setItems(listOfProducts);
     }
-    void AddDataToBuyTableView(){
+    void InitializeBuyTableView(){
         
         buyProdNameCol.setCellValueFactory(d->new ReadOnlyStringWrapper(d.getValue().GetProduct().GetName()));
         buyProdQuantityCol.setCellValueFactory(d->new ReadOnlyStringWrapper(String.valueOf(d.getValue().GetProduct().GetQuantity())));
@@ -108,74 +113,78 @@ public class UserMainScene implements Initializable{
         buyProductsTableView.setItems(listOfProductsToBuy);
     }
     public void AddItemToProductTable(ActionEvent e) throws IOException{
-        selectedProduct = productsTableView.getSelectionModel().getSelectedItem(); 
         CreateAmountScene();
         
-        int indexOfIteminList = listOfProducts.indexOf(selectedProduct); 
-        ProductModel chosenItemFromList = listOfProducts.get(indexOfIteminList);
-
-        if(chosenItemFromList.GetQuantity() - amountToBuy < 0){
-            JOptionPane.showMessageDialog(null, "Not enough items");
-        }
-        else if(chosenItemFromList.GetQuantity() - amountToBuy == 0){
-
-            CheckAndAddProductToList(indexOfIteminList, chosenItemFromList);
-
-            listOfProducts.remove(indexOfIteminList);
-            UpdateBuyProductsTable();
-            UpdateProductsTable();
-        }
-        else{
-            CheckAndAddProductToList( indexOfIteminList, chosenItemFromList);
-            UpdateBuyProductsTable();
-            UpdateProductsTable();
-        }
+        if (amountToBuy > 0) {
+            selectedProduct = productsTableView.getSelectionModel().getSelectedItem(); 
+           
+            int indexOfIteminList = listOfProducts.indexOf(selectedProduct); 
+            ProductModel chosenItemFromList = listOfProducts.get(indexOfIteminList);
+           
+            if(chosenItemFromList.GetQuantity() - amountToBuy < 0){
+                CallAlert("Not enough items", "Error");
+            }
+            else if(chosenItemFromList.GetQuantity() - amountToBuy == 0){
+                
+                CheckAndAddProductToList(indexOfIteminList, chosenItemFromList);
+                
+                listOfProducts.remove(indexOfIteminList);
+                UpdateBuyProductsTable();
+                UpdateProductsTable();
+            }
+            else{
+                CheckAndAddProductToList( indexOfIteminList, chosenItemFromList);
+                UpdateBuyProductsTable();
+                UpdateProductsTable();
+            }
+        } 
     }
+    
     void CheckAndAddProductToList(int indexOfIteminList, ProductModel chosenItemFromList){
-        newProdToBuy = new ItemToBuyModel(new ProductModel(selectedProduct.GetID(),
+        ItemToBuyModel newProdToBuy = new ItemToBuyModel(new ProductModel(selectedProduct.GetID(),
                                                                 selectedProduct.GetName(), 
                                                                 selectedProduct.GetCategory(), 
                                                                 amountToBuy, 
                                                                 selectedProduct.GetPrice()), 
                                                                 amountToBuy); 
-
-            if(DoesListContainsItem(newProdToBuy)){
-                listOfProductsToBuy.forEach(x->{
-                    if(x.GetProduct().GetName() == newProdToBuy.GetProduct().GetName()){
-                        x.SetAmount(x.GetAmount() + amountToBuy);
-                        x.GetProduct().SetQuantity(x.GetProduct().GetQuantity() + amountToBuy);
-                    }
-                });
-                
-                listOfProducts.get(indexOfIteminList).SetQuantity(chosenItemFromList.GetQuantity() - amountToBuy);
-            }
-            else{
-                listOfProductsToBuy.add(newProdToBuy);
-                listOfProducts.get(indexOfIteminList).SetQuantity(chosenItemFromList.GetQuantity() - amountToBuy);
-            }
-
+        if(DoesListContainsItem(newProdToBuy)){
+            listOfProductsToBuy.forEach(x->{
+                if(x.GetProduct().GetName() == newProdToBuy.GetProduct().GetName()){
+                    x.SetAmount(x.GetAmount() + amountToBuy);
+                    x.GetProduct().SetQuantity(x.GetProduct().GetQuantity() + amountToBuy);
+                }
+            });
+            listOfProducts.get(indexOfIteminList).SetQuantity(chosenItemFromList.GetQuantity() - amountToBuy);
+        }
+        else{
+            listOfProductsToBuy.add(newProdToBuy);
+            listOfProducts.get(indexOfIteminList).SetQuantity(chosenItemFromList.GetQuantity() - amountToBuy);
+        } 
+        UpdatePriceLabel();
     }
     void CheckAndAddProductToBuyList(int  indexOfIteminList, ItemToBuyModel chosenItemFromBuyList){
-            ProductModel newProdToList = new ProductModel(chosenItemFromBuyList.GetProduct().GetID(),
-                                                        chosenItemFromBuyList.GetProduct().GetName(), 
-                                                        chosenItemFromBuyList.GetProduct().GetCategory(), 
-                                                        amountToBuy, 
-                                                        chosenItemFromBuyList.GetProduct().GetPrice()); 
+    
+        ProductModel newProdToList = new ProductModel(chosenItemFromBuyList.GetProduct().GetID(),
+                                                    chosenItemFromBuyList.GetProduct().GetName(), 
+                                                    chosenItemFromBuyList.GetProduct().GetCategory(), 
+                                                    amountToBuy, 
+                                                    chosenItemFromBuyList.GetProduct().GetPrice()); 
 
-            if(DoesBuyListContainsItem(newProdToList)){
-                listOfProducts.forEach(x->{
-                    if(x.GetName() == newProdToList.GetName()){
-                        x.SetQuantity(x.GetQuantity() + amountToBuy);
-                    }
-                });
-                
-                listOfProductsToBuy.get(indexOfIteminList).GetProduct().SetQuantity(chosenItemFromBuyList.GetProduct().GetQuantity() - amountToBuy);
-            }
-            else{   
-                listOfProducts.add(newProdToList);
-                listOfProductsToBuy.get(indexOfIteminList).GetProduct().SetQuantity(chosenItemFromBuyList.GetProduct().GetQuantity() - amountToBuy);
-            }
-
+        if(DoesBuyListContainsItem(newProdToList)){
+            listOfProducts.forEach(x->{
+                if(x.GetName() == newProdToList.GetName()){
+                    x.SetQuantity(x.GetQuantity() + amountToBuy);
+                    
+                }
+            });
+            
+            listOfProductsToBuy.get(indexOfIteminList).GetProduct().SetQuantity(chosenItemFromBuyList.GetProduct().GetQuantity() - amountToBuy);
+            listOfProductsToBuy.get(indexOfIteminList).SetAmount(chosenItemFromBuyList.GetAmount() - amountToBuy);
+        }
+        else{   
+            listOfProducts.add(newProdToList);
+            listOfProductsToBuy.get(indexOfIteminList).GetProduct().SetQuantity(chosenItemFromBuyList.GetProduct().GetQuantity() - amountToBuy);
+        }
     }
     Boolean DoesListContainsItem(ItemToBuyModel productModeBuyModel){
         for(int i = 0; i < listOfProductsToBuy.size(); i++){
@@ -197,10 +206,11 @@ public class UserMainScene implements Initializable{
         URL url = new File("ManagementProgramProj/Main/src/Scenes/UserScenes/AmounScene.fxml").toURI().toURL();
         Parent root = FXMLLoader.load(url);
         Scene scene = new Scene(root);
-
+        amountToBuy = 0;
         Stage stage = new Stage();
         stage.setScene(scene);
         stage.initModality(Modality.APPLICATION_MODAL);
+        stage.setResizable(false);
         stage.showAndWait();
     }
     void UpdateBuyProductsTable(){
@@ -213,55 +223,72 @@ public class UserMainScene implements Initializable{
     }
     
     public void RemoveItemFromProductTable(ActionEvent e) throws IOException{
-        ItemToBuyModel selectedProductFromBuyList = buyProductsTableView.getSelectionModel().getSelectedItem(); 
         CreateAmountScene();
         
-        int indexOfIteminList = listOfProductsToBuy.indexOf(selectedProductFromBuyList); 
-        ItemToBuyModel chosenItemFromList = listOfProductsToBuy.get(indexOfIteminList);
-
-        if(chosenItemFromList.GetProduct().GetQuantity() - amountToBuy < 0){
-            JOptionPane.showMessageDialog(null, "Not enough items");
-        }
-        else if(chosenItemFromList.GetProduct().GetQuantity() - amountToBuy == 0){
-
-            CheckAndAddProductToBuyList(indexOfIteminList, chosenItemFromList);
-
-            listOfProductsToBuy.remove(indexOfIteminList);
-            UpdateBuyProductsTable();
-            UpdateProductsTable();
+        if (amountToBuy > 0) {
+            
+            ItemToBuyModel selectedProductFromBuyList = buyProductsTableView.getSelectionModel().getSelectedItem(); 
+            
+            int indexOfIteminList = listOfProductsToBuy.indexOf(selectedProductFromBuyList); 
+            ItemToBuyModel chosenItemFromList = listOfProductsToBuy.get(indexOfIteminList);
+            
+            if(chosenItemFromList.GetProduct().GetQuantity() - amountToBuy < 0){
+                CallAlert("Not enough items", "Error");
+            }
+            else if(chosenItemFromList.GetProduct().GetQuantity() - amountToBuy == 0){
+                CheckAndAddProductToBuyList(indexOfIteminList, chosenItemFromList);
+                
+                listOfProductsToBuy.remove(indexOfIteminList);
+                UpdateBuyProductsTable();
+                UpdateProductsTable();
+            }
+            else{
+                CheckAndAddProductToBuyList(indexOfIteminList, chosenItemFromList);
+                UpdateBuyProductsTable();
+                UpdateProductsTable();
+            }
+            UpdatePriceLabel();
         }
         else{
-            CheckAndAddProductToBuyList(indexOfIteminList, chosenItemFromList);
-            UpdateBuyProductsTable();
-            UpdateProductsTable();
+            CallAlert("Enter a number bigger than 0","Error");
         }
     }
     public void BuyProducts(ActionEvent e) throws SQLException{
-        DBConnection.GetProducts();
-
-        ItemToBuyModel prod;
-        ProductModel prodFromDB;
         
-        int listSize = listOfProductsToBuy.size();
-
-        for (int i = 0; i < listSize; i++) {   
-            prod = listOfProductsToBuy.get(i);
-            prodFromDB = DBConnection.product.get(prod.GetProduct().GetID());
+        if (totalMoney < 1000) {
             
-            if (prodFromDB.GetQuantity() - prod.GetProduct().GetQuantity() > 0) {
-                DBConnection.UpdateProduct(prod.GetProduct().GetID(), 
-                                            prod.GetProduct().GetName(), 
-                                            prod.GetProduct().GetCategory(), 
-                                            prod.GetProduct().GetPrice(), 
-                                            prodFromDB.GetQuantity() - prod.GetProduct().GetQuantity());
+            DBConnection.GetProducts();
+            
+            ItemToBuyModel prod;
+            ProductModel prodFromDB;
+            
+            int listSize = listOfProductsToBuy.size();
+            
+            for (int i = 0; i < listSize; i++) {   
+                prod = listOfProductsToBuy.get(i);
+                prodFromDB = DBConnection.product.get(prod.GetProduct().GetID());
+                
+                if (prodFromDB.GetQuantity() - prod.GetProduct().GetQuantity() > 0) {
+                    DBConnection.UpdateProduct(prod.GetProduct().GetID(), 
+                    prod.GetProduct().GetName(), 
+                    prod.GetProduct().GetCategory(), 
+                    prod.GetProduct().GetPrice(), 
+                    prodFromDB.GetQuantity() - prod.GetProduct().GetQuantity());
+                }
+                else{
+                    DBConnection.DeleteProduct(prod.GetProduct().GetID());
+                }
             }
-            else{
-                DBConnection.DeleteProduct(prod.GetProduct().GetID());
-            }
+            CallAlert("Order is completed!", "Success");
+
+            listOfProductsToBuy.clear();
+            UpdateBuyProductsTable();
+            UpdateProductsTable();
+            UpdatePriceLabel();
         }
-        listOfProductsToBuy.clear();
-        UpdateBuyProductsTable();
-        UpdateProductsTable();
+        else{
+            JOptionPane.showMessageDialog(null, "Not enough money!");
+        }
     }
     public void CloseWindow(ActionEvent e) throws IOException{
         URL url = new File("ManagementProgramProj/Main/src/Scenes/OpenScene.fxml").toURI().toURL();
@@ -272,5 +299,18 @@ public class UserMainScene implements Initializable{
         Scene scene = new Scene(root);
         stage.setScene(scene);
         stage.show();
+    }
+    void UpdatePriceLabel(){
+        totalMoney = 0;
+        for (int i = 0; i < listOfProductsToBuy.size(); i++) {
+            totalMoney+=listOfProductsToBuy.get(i).GetProduct().GetPrice() * listOfProductsToBuy.get(i).GetProduct().GetQuantity();
+        }
+        totalMoneyLabel.setText(String.valueOf(totalMoney).toString());
+    }
+    void CallAlert(String message, String title){
+        alert.setTitle(title);
+        alert.setHeaderText("");
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 }

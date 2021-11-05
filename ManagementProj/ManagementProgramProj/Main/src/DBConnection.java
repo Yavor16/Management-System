@@ -8,7 +8,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import javax.swing.JOptionPane;
+
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 
 public class DBConnection {
     
@@ -16,6 +18,8 @@ public class DBConnection {
     static PreparedStatement pst;
     
     public static Map<Integer, ProductModel> product = new HashMap<>();
+
+    static Alert alert = new Alert(AlertType.WARNING);
 
     public static void Connect(){
         try {
@@ -27,8 +31,9 @@ public class DBConnection {
             dbConnection = DriverManager.getConnection(url, info);
         } 
         catch (SQLException ex) {
-                JOptionPane.showMessageDialog(null, "An error occurred while connecting MySQL database");
-                ex.printStackTrace();
+                alert.setTitle("Error");;
+                alert.setContentText("An error occurred while connecting MySQL database");
+                alert.showAndWait();
         }
     }
     public static void GetProducts() throws SQLException{
@@ -66,10 +71,11 @@ public class DBConnection {
             pst = dbConnection.prepareStatement("delete from product where id= ?");
             pst.setInt(1, id);
             pst.executeUpdate();
-            JOptionPane.showMessageDialog(null, "Deleted");
         }
         catch(Exception exe){
-            JOptionPane.showMessageDialog(null, exe);
+            alert.setTitle("Error");;
+            alert.setContentText(exe.getLocalizedMessage());
+            alert.showAndWait();
         }
     }
     public static void UpdateProduct(int id, String name, String category, float price, int quantity) throws SQLException{
@@ -84,11 +90,11 @@ public class DBConnection {
             pst.setInt(5, id);
             
             pst.executeUpdate();
-            JOptionPane.showMessageDialog(null, "Updated");
         }
-        catch(Exception exe){
-            JOptionPane.showMessageDialog(null, exe);
-
+        catch(Exception exe){          
+            alert.setTitle("Error");;
+            alert.setContentText(exe.getLocalizedMessage());
+            alert.showAndWait();
         }
     }
 }

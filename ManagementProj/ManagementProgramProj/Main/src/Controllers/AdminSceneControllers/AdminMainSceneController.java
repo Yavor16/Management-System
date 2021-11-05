@@ -3,6 +3,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import ManagementProgramProj.Main.src.DBConnection;
 import ManagementProgramProj.Main.src.ProductModel;
@@ -16,10 +17,13 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.scene.Node;
@@ -59,6 +63,7 @@ public class AdminMainSceneController implements Initializable{
     @Override 
     public void initialize(URL url, ResourceBundle rb ){
         listOfProducts = FXCollections.observableArrayList();
+        searchComboBox.setValue("All products");
         InitializeComboBox();
         AddDataToTableView();
     }
@@ -86,15 +91,26 @@ public class AdminMainSceneController implements Initializable{
     public void DeleteProduct(ActionEvent e) throws SQLException{
         selectedProduct = productsTableView.getSelectionModel().getSelectedItem();  
 
-        DBConnection.DeleteProduct(selectedProduct.GetID());
-        listOfProducts.remove(listOfProducts.indexOf(selectedProduct));
-        UpdateTableView();
+        Alert confirmDiag = new Alert(AlertType.CONFIRMATION);
+        confirmDiag.setTitle("Delete");
+        confirmDiag.setHeaderText("Are you sure you want to delete " + selectedProduct.GetName());
+        
+        Optional<ButtonType> result = confirmDiag.showAndWait();
+
+        if (result.get() == ButtonType.OK) {   
+            DBConnection.DeleteProduct(selectedProduct.GetID());
+            listOfProducts.remove(listOfProducts.indexOf(selectedProduct));
+            UpdateTableView();
+        }
+        else{
+            confirmDiag.close();
+        }
     }
-    void UpdateTableView() throws SQLException{
+    private void UpdateTableView() throws SQLException{
         DBConnection.GetProducts();
         if (!searchComboBox.getSelectionModel().isEmpty()){
 
-            if (searchComboBox.getValue().toString() == "Don't search" ){
+            if (searchComboBox.getValue().toString() == "All products" ){
                 productsTableView.setItems(listOfProducts);
             }
             else{
@@ -110,7 +126,7 @@ public class AdminMainSceneController implements Initializable{
         return scene;
     }
     void InitializeComboBox(){
-        ObservableList<String> comboBoxItems = FXCollections.observableArrayList("Fruits", "Vegetables", "Meat", "Alcohol", "Don't search");
+        ObservableList<String> comboBoxItems = FXCollections.observableArrayList("Fruits", "Vegetables", "Meat", "Alcohol", "All products");
         searchComboBox.setItems(comboBoxItems);
     }
     public void SearchUsingComboBox(ActionEvent e) throws SQLException{

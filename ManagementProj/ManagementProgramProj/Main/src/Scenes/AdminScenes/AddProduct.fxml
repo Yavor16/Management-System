@@ -9,7 +9,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="209.0" prefWidth="293.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ManagementProgramProj.Main.src.Controllers.AdminSceneControllers.AddProductController">
+<AnchorPane fx:id="ap" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="209.0" prefWidth="293.0" style="-fx-background-color: #333;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ManagementProgramProj.Main.src.Controllers.AdminSceneControllers.AddProductController">
    <children>
       <VBox layoutX="109.0" layoutY="10.0" prefHeight="153.0" prefWidth="160.0">
          <children>
@@ -33,7 +33,7 @@
       </VBox>
       <VBox layoutX="31.0" layoutY="14.0" prefHeight="126.0" prefWidth="77.0">
          <children>
-            <Label text="Name">
+            <Label style="-fx-text-fill: white;" text="Name">
                <font>
                   <Font size="16.0" />
                </font>
@@ -41,7 +41,7 @@
                   <Insets bottom="5.0" />
                </VBox.margin>
             </Label>
-            <Label text="Quantity">
+            <Label style="-fx-text-fill: white;" text="Quantity">
                <font>
                   <Font size="16.0" />
                </font>
@@ -49,7 +49,7 @@
                   <Insets bottom="5.0" top="5.0" />
                </VBox.margin>
             </Label>
-            <Label text="Price:">
+            <Label style="-fx-text-fill: white;" text="Price:">
                <font>
                   <Font size="16.0" />
                </font>
@@ -57,7 +57,7 @@
                   <Insets bottom="5.0" top="5.0" />
                </VBox.margin>
             </Label>
-            <Label text="Category:">
+            <Label style="-fx-text-fill: white;" text="Category:">
                <font>
                   <Font size="16.0" />
                </font>
@@ -67,6 +67,7 @@
             </Label>
          </children>
       </VBox>
-      <Button fx:id="saveChangesBttn" layoutX="108.0" layoutY="163.0" mnemonicParsing="false" onAction="#addProduct" prefHeight="29.0" prefWidth="77.0" text="ADD" />
+      <Button fx:id="saveChangesBttn" layoutX="108.0" layoutY="163.0" mnemonicParsing="false" onAction="#AddProduct" prefHeight="29.0" prefWidth="77.0" text="ADD" />
+      <Button fx:id="saveChangesBttn1" layoutX="202.0" layoutY="163.0" mnemonicParsing="false" onAction="#CancelProduct" prefHeight="29.0" prefWidth="77.0" text="CANCEL" />
    </children>
 </AnchorPane>
