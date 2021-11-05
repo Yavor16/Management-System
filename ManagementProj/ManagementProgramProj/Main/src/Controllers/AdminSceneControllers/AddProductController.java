@@ -130,12 +130,12 @@ public class AddProductController implements Initializable {
         }
     }
     Boolean SetPrice(){
-        if(priceText.getText().matches("[0-9]+")){
+        try{
             price = Float.parseFloat(priceText.getText());
             price = Math.round(price);
             return true;
         }
-        else{
+        catch(Exception e){
             Alert alert = new Alert(AlertType.INFORMATION);
             alert.setTitle("Error");
             alert.setHeaderText("");

@@ -249,46 +249,37 @@ public class UserMainScene implements Initializable{
             }
             UpdatePriceLabel();
         }
-        else{
-            CallAlert("Enter a number bigger than 0","Error");
-        }
     }
     public void BuyProducts(ActionEvent e) throws SQLException{
+      
+        DBConnection.GetProducts();
         
-        if (totalMoney < 1000) {
+        ItemToBuyModel prod;
+        ProductModel prodFromDB;
+        
+        int listSize = listOfProductsToBuy.size();
+        
+        for (int i = 0; i < listSize; i++) {   
+            prod = listOfProductsToBuy.get(i);
+            prodFromDB = DBConnection.product.get(prod.GetProduct().GetID());
             
-            DBConnection.GetProducts();
-            
-            ItemToBuyModel prod;
-            ProductModel prodFromDB;
-            
-            int listSize = listOfProductsToBuy.size();
-            
-            for (int i = 0; i < listSize; i++) {   
-                prod = listOfProductsToBuy.get(i);
-                prodFromDB = DBConnection.product.get(prod.GetProduct().GetID());
-                
-                if (prodFromDB.GetQuantity() - prod.GetProduct().GetQuantity() > 0) {
-                    DBConnection.UpdateProduct(prod.GetProduct().GetID(), 
-                    prod.GetProduct().GetName(), 
-                    prod.GetProduct().GetCategory(), 
-                    prod.GetProduct().GetPrice(), 
-                    prodFromDB.GetQuantity() - prod.GetProduct().GetQuantity());
-                }
-                else{
-                    DBConnection.DeleteProduct(prod.GetProduct().GetID());
-                }
+            if (prodFromDB.GetQuantity() - prod.GetProduct().GetQuantity() > 0) {
+                DBConnection.UpdateProduct(prod.GetProduct().GetID(), 
+                                            prod.GetProduct().GetName(), 
+                                            prod.GetProduct().GetCategory(), 
+                                            prod.GetProduct().GetPrice(), 
+                                            prodFromDB.GetQuantity() - prod.GetProduct().GetQuantity());
             }
-            CallAlert("Order is completed!", "Success");
+            else{
+                DBConnection.DeleteProduct(prod.GetProduct().GetID());
+            }
+        }
+        CallAlert("Order is completed!", "Success");
 
-            listOfProductsToBuy.clear();
-            UpdateBuyProductsTable();
-            UpdateProductsTable();
-            UpdatePriceLabel();
-        }
-        else{
-            JOptionPane.showMessageDialog(null, "Not enough money!");
-        }
+        listOfProductsToBuy.clear();
+        UpdateBuyProductsTable();
+        UpdateProductsTable();
+        UpdatePriceLabel();
     }
     public void CloseWindow(ActionEvent e) throws IOException{
         URL url = new File("ManagementProgramProj/Main/src/Scenes/OpenScene.fxml").toURI().toURL();

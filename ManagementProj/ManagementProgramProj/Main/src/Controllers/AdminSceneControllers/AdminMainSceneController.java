@@ -65,6 +65,12 @@ public class AdminMainSceneController implements Initializable{
         listOfProducts = FXCollections.observableArrayList();
         searchComboBox.setValue("All products");
         InitializeComboBox();
+        try {
+            DBConnection.GetProducts();
+            UpdateTableView();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         AddDataToTableView();
     }
 

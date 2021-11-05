@@ -34,7 +34,8 @@ public class EditProductController implements Initializable{
     ProductModel selectedProd = AdminMainSceneController.selectedProduct; 
 
     String selectedCategory;
-
+    float price;
+    int quantity;
     ProductModel productToAdd;
 
     int selectedProductID = AdminMainSceneController.listOfProducts.indexOf(selectedProd);
@@ -51,30 +52,85 @@ public class EditProductController implements Initializable{
     }
     public void UpdateProduct(ActionEvent e) throws SQLException {
         try{
-            float price = Float.parseFloat(priceText.getText());
-            int quantity = Integer.parseInt(quantityText.getText());
-            selectedCategory = categoryComboBox.getValue().toString();
-           
-            DBConnection.UpdateProduct(selectedProd.GetID(), nameText.getText(), selectedCategory, price , quantity);
-            AdminMainSceneController.listOfProducts.remove(selectedProductID);
+            if(SetPrice() && CheckComboBoxInput() && SetQuantity()){
+                selectedCategory = categoryComboBox.getValue().toString();
             
-            AdminMainSceneController.listOfProducts.add(selectedProductID,
-             new ProductModel(selectedProd.GetID(), nameText.getText(), selectedCategory, quantity , price)
-            );
-            Alert alert = new Alert(AlertType.INFORMATION);
-            alert.setTitle("Update");
-            alert.setHeaderText("");
-            alert.setContentText(selectedProd.GetName() + " updated!");
-            alert.showAndWait();
+                DBConnection.UpdateProduct(selectedProd.GetID(), nameText.getText(), selectedCategory, price , quantity);
+                AdminMainSceneController.listOfProducts.remove(selectedProductID);
+                
+                AdminMainSceneController.listOfProducts.add(selectedProductID,
+                new ProductModel(selectedProd.GetID(), nameText.getText(), selectedCategory, quantity , price)
+                );
+                Alert alert = new Alert(AlertType.INFORMATION);
+                alert.setTitle("Update");
+                alert.setHeaderText("");
+                alert.setContentText(selectedProd.GetName() + " updated!");
+                alert.showAndWait();
+            }
             Stage stage = (Stage)((Node)e.getSource()).getScene().getWindow();
             stage.close();
         }
         catch(Exception exe){
-            JOptionPane.showMessageDialog(null, exe.getMessage());
+            Alert alert = new Alert(AlertType.INFORMATION);
+            alert.setTitle("New product");
+            alert.setHeaderText("");
+            alert.setContentText(exe.getLocalizedMessage());
+            alert.showAndWait();
         }
     }
     public void CancelProduct(ActionEvent e ){
         Stage stage = (Stage)((Node)e.getSource()).getScene().getWindow();
         stage.close();
+    }
+    Boolean SetQuantity(){
+        Alert alert = new Alert(AlertType.INFORMATION);
+        alert.setTitle("Error");
+        alert.setHeaderText("");
+
+        if(quantityText.getText().matches("[0-9]+")){
+            try{
+                quantity = Integer.parseInt(quantityText.getText());
+                return true;
+            }catch(Exception e){
+                alert.setContentText("Enter smaller quantity!");
+                alert.showAndWait();
+                return false;
+            }
+        }
+        else{
+            alert.setContentText("Quantity: Enter only numbers");
+            alert.showAndWait();
+            return false;
+        }
+    }
+    Boolean CheckComboBoxInput(){
+        try{
+            selectedCategory = categoryComboBox.getValue().toString();
+            return true;
+        }
+        catch(Exception exe){
+            Alert alert = new Alert(AlertType.INFORMATION);
+            alert.setTitle("Error");
+            alert.setHeaderText("");
+            alert.setContentText("Choose category!");
+            alert.showAndWait();
+            return false;
+        }
+    }
+    Boolean SetPrice(){
+        
+        try{
+            price = Float.parseFloat(priceText.getText());
+            price = Math.round(price);
+            return true;
+        }
+        catch(Exception e){
+            Alert alert = new Alert(AlertType.INFORMATION);
+            alert.setTitle("Error");
+            alert.setHeaderText("");
+            alert.setContentText("Price: Enter only numbers");
+            alert.showAndWait();
+            return false;
+        }
     }
 }
