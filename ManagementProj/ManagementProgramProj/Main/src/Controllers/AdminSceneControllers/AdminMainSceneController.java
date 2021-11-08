@@ -1,12 +1,18 @@
-package ManagementProgramProj.Main.src.Controllers.AdminSceneControllers;
+package Controllers.AdminSceneControllers;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.Optional;
 import java.util.ResourceBundle;
-import ManagementProgramProj.Main.src.DBConnection;
-import ManagementProgramProj.Main.src.ProductModel;
+
+
+import Models.ClothesModel;
+import Models.ProductModel;
+import Models.TechnologyProductModel;
+import Models.VegetangleFruitModel;
+import Controllers.DBConnection;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
@@ -27,6 +33,7 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.scene.Node;
+
 public class AdminMainSceneController implements Initializable{
 
     private Stage stage;
@@ -34,7 +41,8 @@ public class AdminMainSceneController implements Initializable{
     private Parent root;
 
     public static ProductModel selectedProduct;
-    static ObservableList<ProductModel> listOfProducts;
+    public static ObservableList<ProductModel> listOfProducts;
+
     //FXML location URL
     URL url;
 
@@ -68,27 +76,43 @@ public class AdminMainSceneController implements Initializable{
         try {
             DBConnection.GetProducts();
             UpdateTableView();
+            AddDataToTableView();
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        AddDataToTableView();
     }
 
     public void OpenAddProductScene(ActionEvent e) throws IOException, SQLException{
 
         stage = new Stage();
-        stage.setScene(CreateScene("AddProduct"));
+        stage.setScene(CreateScene("ChooseCategoryScene"));
 
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.showAndWait();
-         
         UpdateTableView();
     }
     public void OpenEditProductScene(ActionEvent e) throws IOException, SQLException{
         selectedProduct = productsTableView.getSelectionModel().getSelectedItem(); 
 
         stage = new Stage();
-        stage.setScene(CreateScene("EditProductScene"));
+        DBConnection.GetSpecificProduct(selectedProduct.GetID());
+        String mainCat = DBConnection.wantedProd.GetMainCategory(); 
+        
+        if (mainCat.equals("Technology")) {
+            TechnologyProductModel tm = (TechnologyProductModel)DBConnection.wantedProd; 
+            selectedProduct = tm;
+            stage.setScene(CreateScene("TechnologyEditScene"));
+        }
+        else if (mainCat.equals("Food")) {
+            VegetangleFruitModel fm = (VegetangleFruitModel)DBConnection.wantedProd;
+            selectedProduct= fm;
+            stage.setScene(CreateScene("FoodEditScene"));
+        }
+        else if(mainCat.equals("Clothes")){
+            ClothesModel cm = (ClothesModel)DBConnection.wantedProd;
+            selectedProduct = cm;
+            stage.setScene(CreateScene("ClothesEditScene"));
+        }
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.showAndWait();
         
@@ -126,20 +150,21 @@ public class AdminMainSceneController implements Initializable{
         }
     }
     Scene CreateScene(String fileName) throws IOException{
-        url = new File("ManagementProgramProj/Main/src/Scenes/AdminScenes/" + fileName + ".fxml").toURI().toURL();
+        url = new File("Main/src/Scenes/AdminScenes/" + fileName + ".fxml").toURI().toURL();
         root = FXMLLoader.load(url);
+        
         scene = new Scene(root);
         return scene;
     }
     void InitializeComboBox(){
-        ObservableList<String> comboBoxItems = FXCollections.observableArrayList("Fruits", "Vegetables", "Meat", "Alcohol", "All products");
+        ObservableList<String> comboBoxItems = FXCollections.observableArrayList("Technology", "Food", "Clothes", "All products");
         searchComboBox.setItems(comboBoxItems);
     }
     public void SearchUsingComboBox(ActionEvent e) throws SQLException{
         UpdateTableView();
     }
     public void CloseWindow(ActionEvent e) throws IOException{
-        url = new File("ManagementProgramProj/Main/src/Scenes/OpenScene.fxml").toURI().toURL();
+        url = new File("Main/src/Scenes/OpenScene.fxml").toURI().toURL();
         
         root = FXMLLoader.load(url);
 
@@ -152,17 +177,21 @@ public class AdminMainSceneController implements Initializable{
         ObservableList<ProductModel> searchResultList = FXCollections.observableArrayList();
 
         for (ProductModel prod : listOfProducts){
-            if(prod.GetCategory().equals(searchComboBox.getValue().toString()) ){
+            if(prod.GetMainCategory().equals(searchComboBox.getValue().toString()) ){
                 searchResultList.add(prod);
             }
         }
         return searchResultList;
     }
-
-    void AddDataToTableView(){
+    public static void SetListOfProducts() throws SQLException{
+        DBConnection.GetProducts();
+        listOfProducts.clear();
         for(var prod : DBConnection.product.entrySet()){
             listOfProducts.add(prod.getValue());
         }
+    }
+    void AddDataToTableView() throws SQLException{
+        SetListOfProducts();
 
         nameTableCol.setCellValueFactory(d->new ReadOnlyStringWrapper(d.getValue().GetName()));
         categoryTableCol.setCellValueFactory(d->new ReadOnlyStringWrapper(d.getValue().GetCategory()));

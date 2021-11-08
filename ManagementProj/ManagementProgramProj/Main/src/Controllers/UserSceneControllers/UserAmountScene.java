@@ -1,4 +1,4 @@
-package ManagementProgramProj.Main.src.Controllers.UserSceneControllers;
+package Controllers.UserSceneControllers;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;

@@ -5,12 +5,13 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="ap" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="209.0" prefWidth="293.0" style="-fx-background-color: #333;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controllers.AdminSceneControllers.AddProductController">
+<AnchorPane fx:id="ap" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="171.0" prefWidth="293.0" style="-fx-background-color: #333;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controllers.AdminSceneControllers.EditControllers.FoodEditController">
    <children>
-      <VBox fx:id="testFieldVBox" layoutX="109.0" layoutY="10.0" prefHeight="153.0" prefWidth="160.0">
+      <VBox layoutX="109.0" layoutY="10.0" prefHeight="109.0" prefWidth="160.0">
          <children>
             <TextField fx:id="nameText" promptText="Name">
                <font>
@@ -27,9 +28,10 @@
                   <Font size="16.0" />
                </font>
             </TextField>
+            <HBox prefHeight="1.0" prefWidth="160.0" />
          </children>
       </VBox>
-      <VBox fx:id="labelVBox" layoutX="31.0" layoutY="14.0" prefHeight="126.0" prefWidth="77.0">
+      <VBox layoutX="12.0" layoutY="14.0" prefHeight="196.0" prefWidth="96.0">
          <children>
             <Label style="-fx-text-fill: white;" text="Name">
                <font>
@@ -57,7 +59,7 @@
             </Label>
          </children>
       </VBox>
-      <Button fx:id="saveChangesBttn" layoutX="108.0" layoutY="163.0" mnemonicParsing="false" onAction="#AddProduct" prefHeight="29.0" prefWidth="77.0" text="ADD" />
-      <Button fx:id="saveChangesBttn1" layoutX="202.0" layoutY="163.0" mnemonicParsing="false" onAction="#CancelProduct" prefHeight="29.0" prefWidth="77.0" text="CANCEL" />
+      <Button fx:id="saveChangesBttn" layoutX="108.0" layoutY="133.0" mnemonicParsing="false" onAction="#UpdateProduct" prefHeight="29.0" prefWidth="77.0" text="UPDATE" />
+      <Button fx:id="saveChangesBttn1" layoutX="192.0" layoutY="133.0" mnemonicParsing="false" onAction="#CancelProduct" prefHeight="29.0" prefWidth="77.0" text="CANCEL" />
    </children>
 </AnchorPane>

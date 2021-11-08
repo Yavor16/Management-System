@@ -1,4 +1,4 @@
-package ManagementProgramProj.Main.src.Controllers.UserSceneControllers;
+package Controllers.UserSceneControllers;
 
 import java.io.File;
 import java.io.IOException;
@@ -8,10 +8,9 @@ import java.util.ResourceBundle;
 
 import javax.swing.JOptionPane;
 
-
-import ManagementProgramProj.Main.src.DBConnection;
-import ManagementProgramProj.Main.src.ProductModel;
-import ManagementProgramProj.Main.src.Models.ItemToBuyModel;
+import Controllers.DBConnection;
+import Models.ProductModel;
+import Models.ItemToBuyModel;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
@@ -33,7 +32,6 @@ import javafx.stage.Stage;
 import javafx.scene.Node;
 
 public class UserMainScene implements Initializable{
-    
     /*All products table*/
     @FXML
     TableView<ProductModel> productsTableView;
@@ -74,7 +72,7 @@ public class UserMainScene implements Initializable{
 
     static ObservableList<ProductModel> listOfProducts;
     ObservableList<ItemToBuyModel>listOfProductsToBuy;
-    
+
     @Override 
     public void initialize(URL url, ResourceBundle rb ){
         listOfProducts = FXCollections.observableArrayList();
@@ -203,7 +201,7 @@ public class UserMainScene implements Initializable{
         return false;
     }
     void CreateAmountScene() throws IOException{
-        URL url = new File("ManagementProgramProj/Main/src/Scenes/UserScenes/AmounScene.fxml").toURI().toURL();
+        URL url = new File("Main/src/Scenes/UserScenes/AmounScene.fxml").toURI().toURL();
         Parent root = FXMLLoader.load(url);
         Scene scene = new Scene(root);
         amountToBuy = 0;
@@ -264,11 +262,11 @@ public class UserMainScene implements Initializable{
             prodFromDB = DBConnection.product.get(prod.GetProduct().GetID());
             
             if (prodFromDB.GetQuantity() - prod.GetProduct().GetQuantity() > 0) {
-                DBConnection.UpdateProduct(prod.GetProduct().GetID(), 
-                                            prod.GetProduct().GetName(), 
-                                            prod.GetProduct().GetCategory(), 
-                                            prod.GetProduct().GetPrice(), 
-                                            prodFromDB.GetQuantity() - prod.GetProduct().GetQuantity());
+                //DBConnection.UpdateProduct(prod.GetProduct().GetID(), 
+                //                            prod.GetProduct().GetName(), 
+                ///                            prod.GetProduct().GetCategory(), 
+                //                            prod.GetProduct().GetPrice(), 
+                //                            prodFromDB.GetQuantity() - prod.GetProduct().GetQuantity());
             }
             else{
                 DBConnection.DeleteProduct(prod.GetProduct().GetID());
@@ -282,7 +280,7 @@ public class UserMainScene implements Initializable{
         UpdatePriceLabel();
     }
     public void CloseWindow(ActionEvent e) throws IOException{
-        URL url = new File("ManagementProgramProj/Main/src/Scenes/OpenScene.fxml").toURI().toURL();
+        URL url = new File("Main/src/Scenes/OpenScene.fxml").toURI().toURL();
         
         Parent root = FXMLLoader.load(url);
 

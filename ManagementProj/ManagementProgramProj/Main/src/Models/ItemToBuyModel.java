@@ -1,11 +1,10 @@
-package ManagementProgramProj.Main.src.Models;
-
-import ManagementProgramProj.Main.src.ProductModel;
+package Models;
 
 public class ItemToBuyModel {
+
     private ProductModel prodModel;
     private int amount;
-    
+
     public ItemToBuyModel(ProductModel prodModel, int amount) {
         this.amount = amount;
         this.prodModel = prodModel;
