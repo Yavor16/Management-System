@@ -10,6 +10,9 @@ import javax.swing.JOptionPane;
 
 import Controllers.DBConnection;
 import Models.ProductModel;
+import Models.TechnologyProductModel;
+import Models.VegetangleFruitModel;
+import Models.ClothesModel;
 import Models.ItemToBuyModel;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ReadOnlyStringWrapper;
@@ -31,7 +34,8 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.scene.Node;
 
-public class UserMainScene implements Initializable{
+public class 
+UserMainScene implements Initializable{
     /*All products table*/
     @FXML
     TableView<ProductModel> productsTableView;
@@ -65,6 +69,7 @@ public class UserMainScene implements Initializable{
     Button closeWindowBttn;
     @FXML
     Label totalMoneyLabel;
+    
     static Alert alert = new Alert(AlertType.INFORMATION);
     public ProductModel selectedProduct;
     public static int amountToBuy;
@@ -77,10 +82,11 @@ public class UserMainScene implements Initializable{
     public void initialize(URL url, ResourceBundle rb ){
         listOfProducts = FXCollections.observableArrayList();
         listOfProductsToBuy = FXCollections.observableArrayList();
-        
+
         totalMoneyLabel.setText("0.0");
         try {
             InitializeTableView();
+            System.out.println(listOfProducts);
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null, e.getMessage());
         }
@@ -88,6 +94,28 @@ public class UserMainScene implements Initializable{
         removeFromProdTableBttn.disableProperty().bind(Bindings.isEmpty(buyProductsTableView.getSelectionModel().getSelectedItems()));
         addToProdTableBttn.disableProperty().bind(Bindings.isEmpty(productsTableView.getSelectionModel().getSelectedItems()));
         buyBttn.disableProperty().bind(Bindings.isEmpty(listOfProductsToBuy));
+       
+        if(!MainScene.basketItems.isEmpty()){
+            listOfProductsToBuy.clear();
+            for (var productModel : MainScene.basketItems.entrySet()) {
+                listOfProductsToBuy.add(new ItemToBuyModel( 
+                                        new ProductModel(productModel.getKey().GetID(), 
+                                        productModel.getKey().GetName(), 
+                                        productModel.getKey().GetCategory(), 
+                                        productModel.getValue(), 
+                                        productModel.getKey().GetPrice()),
+                                        productModel.getValue()) );
+                                        
+                
+                
+                amountToBuy = productModel.getValue();
+                selectedProduct = productModel.getKey();
+                
+                AddToBuyListFromBasket();
+                UpdateProductsTable();   
+               
+            }
+        }
     }
     void InitializeTableView() throws SQLException{
         for(var prod : DBConnection.product.entrySet()){
@@ -111,6 +139,24 @@ public class UserMainScene implements Initializable{
         buyProductsTableView.setItems(listOfProductsToBuy);
     }
     public void AddItemToProductTable(ActionEvent e) throws IOException{
+        AddProdToTable();
+    }
+    void AddToBuyListFromBasket(){
+        if (amountToBuy > 0) {
+
+            int indexOfIteminList = listOfProducts.indexOf(selectedProduct); 
+            ProductModel chosenItemFromList = listOfProducts.get(indexOfIteminList);
+           
+            if(chosenItemFromList.GetQuantity() - amountToBuy == 0){
+                listOfProducts.remove(indexOfIteminList);
+            }else{
+                listOfProducts.get(indexOfIteminList).SetQuantity(chosenItemFromList.GetQuantity() - amountToBuy);    
+            }
+            UpdateBuyProductsTable();
+            UpdatePriceLabel(); 
+        }
+    }
+    public void AddProdToTable() throws IOException{
         CreateAmountScene();
         
         if (amountToBuy > 0) {
@@ -124,28 +170,28 @@ public class UserMainScene implements Initializable{
             }
             else if(chosenItemFromList.GetQuantity() - amountToBuy == 0){
                 
-                CheckAndAddProductToList(indexOfIteminList, chosenItemFromList);
+                CheckAndAddProductToList(indexOfIteminList, chosenItemFromList, true);
                 
                 listOfProducts.remove(indexOfIteminList);
                 UpdateBuyProductsTable();
                 UpdateProductsTable();
             }
             else{
-                CheckAndAddProductToList( indexOfIteminList, chosenItemFromList);
+                CheckAndAddProductToList( indexOfIteminList, chosenItemFromList, true);
                 UpdateBuyProductsTable();
                 UpdateProductsTable();
             }
+           
         } 
     }
-    
-    void CheckAndAddProductToList(int indexOfIteminList, ProductModel chosenItemFromList){
+    void CheckAndAddProductToList(int indexOfIteminList, ProductModel chosenItemFromList, Boolean addIfContains){
         ItemToBuyModel newProdToBuy = new ItemToBuyModel(new ProductModel(selectedProduct.GetID(),
                                                                 selectedProduct.GetName(), 
                                                                 selectedProduct.GetCategory(), 
                                                                 amountToBuy, 
                                                                 selectedProduct.GetPrice()), 
                                                                 amountToBuy); 
-        if(DoesListContainsItem(newProdToBuy)){
+        if(DoesListContainsItem(newProdToBuy) && addIfContains){
             listOfProductsToBuy.forEach(x->{
                 if(x.GetProduct().GetName() == newProdToBuy.GetProduct().GetName()){
                     x.SetAmount(x.GetAmount() + amountToBuy);
@@ -219,7 +265,7 @@ public class UserMainScene implements Initializable{
         productsTableView.setItems(listOfProducts);
         productsTableView.refresh();
     }
-    
+    /*
     public void RemoveItemFromProductTable(ActionEvent e) throws IOException{
         CreateAmountScene();
         
@@ -238,17 +284,18 @@ public class UserMainScene implements Initializable{
                 
                 listOfProductsToBuy.remove(indexOfIteminList);
                 UpdateBuyProductsTable();
-                UpdateProductsTable();
+                //UpdateProductsTable();
             }
             else{
                 CheckAndAddProductToBuyList(indexOfIteminList, chosenItemFromList);
                 UpdateBuyProductsTable();
-                UpdateProductsTable();
+                //UpdateProductsTable();
             }
             UpdatePriceLabel();
         }
     }
-    public void BuyProducts(ActionEvent e) throws SQLException{
+    */
+    public void BuyProducts(ActionEvent e) throws SQLException, IOException{
       
         DBConnection.GetProducts();
         
@@ -262,11 +309,11 @@ public class UserMainScene implements Initializable{
             prodFromDB = DBConnection.product.get(prod.GetProduct().GetID());
             
             if (prodFromDB.GetQuantity() - prod.GetProduct().GetQuantity() > 0) {
-                //DBConnection.UpdateProduct(prod.GetProduct().GetID(), 
-                //                            prod.GetProduct().GetName(), 
-                ///                            prod.GetProduct().GetCategory(), 
-                //                            prod.GetProduct().GetPrice(), 
-                //                            prodFromDB.GetQuantity() - prod.GetProduct().GetQuantity());
+               
+                //prodFromDB.SetQuantity(prodFromDB.GetQuantity() - prod.GetProduct().GetQuantity());
+                //newProD.SetMainCategory(prodFromDB.GetMainCategory());
+                DBConnection.product.get(prod.GetProduct().GetID()).SetQuantity(prodFromDB.GetQuantity() - prod.GetProduct().GetQuantity());
+                DBConnection.UpdateProduct(DBConnection.product.get(prod.GetProduct().GetID()));
             }
             else{
                 DBConnection.DeleteProduct(prod.GetProduct().GetID());
@@ -276,18 +323,13 @@ public class UserMainScene implements Initializable{
 
         listOfProductsToBuy.clear();
         UpdateBuyProductsTable();
-        UpdateProductsTable();
         UpdatePriceLabel();
+        Stage stage = (Stage)((Node)e.getSource()).getScene().getWindow();
+        stage.close();
     }
     public void CloseWindow(ActionEvent e) throws IOException{
-        URL url = new File("Main/src/Scenes/OpenScene.fxml").toURI().toURL();
-        
-        Parent root = FXMLLoader.load(url);
-
-        Stage stage = (Stage)((Node )e.getSource()).getScene().getWindow();
-        Scene scene = new Scene(root);
-        stage.setScene(scene);
-        stage.show();
+        Stage stage = (Stage)((Node)e.getSource()).getScene().getWindow();
+        stage.close();
     }
     void UpdatePriceLabel(){
         totalMoney = 0;
@@ -301,5 +343,20 @@ public class UserMainScene implements Initializable{
         alert.setHeaderText("");
         alert.setContentText(message);
         alert.showAndWait();
+    }
+    
+    ProductModel CreateProd(ProductModel prod){
+        if (prod instanceof TechnologyProductModel) {
+            TechnologyProductModel tm = (TechnologyProductModel)prod;
+            System.out.println(2222);
+            return tm;
+        }
+        else if (prod.GetMainCategory().equals("Food")) {
+            VegetangleFruitModel vm = (VegetangleFruitModel)prod;
+            return vm;
+        }
+        ClothesModel cm = (ClothesModel)prod;
+        return cm;
+    
     }
 }

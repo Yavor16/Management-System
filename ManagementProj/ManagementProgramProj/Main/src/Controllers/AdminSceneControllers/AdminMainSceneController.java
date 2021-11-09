@@ -41,7 +41,7 @@ public class AdminMainSceneController implements Initializable{
     private Parent root;
 
     public static ProductModel selectedProduct;
-    public static ObservableList<ProductModel> listOfProducts;
+    public static ObservableList<ProductModel> listOfProducts ;
 
     //FXML location URL
     URL url;
@@ -184,6 +184,7 @@ public class AdminMainSceneController implements Initializable{
         return searchResultList;
     }
     public static void SetListOfProducts() throws SQLException{
+        listOfProducts = FXCollections.observableArrayList();
         DBConnection.GetProducts();
         listOfProducts.clear();
         for(var prod : DBConnection.product.entrySet()){

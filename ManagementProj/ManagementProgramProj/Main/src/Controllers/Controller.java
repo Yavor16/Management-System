@@ -35,7 +35,7 @@ public class Controller  implements Initializable{
         AddImageToBttn(buyBttn, "userImage");
     }
     public void OpenUserScene(ActionEvent e) throws IOException{
-        URL url = new File("Main/src/Scenes/UserScenes/UserScene.fxml").toURI().toURL();
+        URL url = new File("Main/src/Scenes/UserScenes/MainUserScene.fxml").toURI().toURL();
         root = FXMLLoader.load(url);
         stage = (Stage)((Node )e.getSource()).getScene().getWindow();
         scene = new Scene(root);

@@ -5,9 +5,8 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Properties;
+import java.util.TreeMap;
 
 import Models.ClothesModel;
 import Models.ProductModel;
@@ -21,7 +20,7 @@ public class DBConnection {
     static Connection dbConnection = null;
     static PreparedStatement pst;
     
-    public static Map<Integer, ProductModel> product = new HashMap<>();
+    public static TreeMap<Integer, ProductModel> product = new TreeMap<Integer, ProductModel>();
 
     static Alert alert = new Alert(AlertType.WARNING);
 
@@ -46,20 +45,37 @@ public class DBConnection {
         final ResultSet rs = dbConnection.createStatement().executeQuery(SQL);
         ProductModel currentProduct;
         product.clear();
-        
+
         while (rs.next()) {
-            currentProduct = new ProductModel(rs.getInt("id"), 
-                                                rs.getString("name"), 
-                                                rs.getString("category"), 
-                                                rs.getInt("quantity"), 
-                                                rs.getFloat("price"));
-            currentProduct.SetMainCategory(rs.getString("maincategory"));
+            if(rs.getString("maincategory").equals("Technology")){
+                currentProduct = new TechnologyProductModel(rs.getInt("id"), 
+                                                            rs.getString("name"), 
+                                                            rs.getString("category"), 
+                                                            rs.getInt("quantity"), 
+                                                            rs.getFloat("price"), 
+                                                            rs.getString("resolution"), 
+                                                            rs.getBoolean("used"));
+            }
+            else if (rs.getString("maincategory").equals("Food")) {
+                currentProduct = new VegetangleFruitModel(rs.getInt("id"), 
+                                                        rs.getString("name"), 
+                                                        rs.getString("category"), 
+                                                        rs.getInt("quantity"), 
+                                                        rs.getFloat("price"));
+            }
+            else{
+                currentProduct = new ClothesModel(rs.getInt("id"), 
+                                                    rs.getString("name"), 
+                                                    rs.getString("category"), 
+                                                    rs.getInt("quantity"), 
+                                                    rs.getFloat("price"), 
+                                                    rs.getString("size"));
+            }
             product.put(currentProduct.GetID(), currentProduct); 
         }
     }
     public static void AddProduct(ProductModel pm) throws SQLException{
         
-        //pst = dbConnection.prepareStatement("insert into product(id,name,category,price,quantity)values(?,?,?,?,?)");
         pst = dbConnection.prepareStatement("insert into product(id,name,category,price,quantity,resolution,used,size,maincategory)values(?,?,?,?,?,?,?,?,?)");
         
         pst.setInt(1, pm.GetID());
@@ -116,7 +132,7 @@ public class DBConnection {
             pst.setInt(9, pm.GetID());
             
 
-            if (pm instanceof TechnologyProductModel) {
+            if (pm instanceof TechnologyProductModel ) {
                 TechnologyProductModel tp = (TechnologyProductModel)pm;
                 int isUsed = tp.GetUsed() ? 1 : 0;
                 pst.setString(5, tp.GetResolution());
@@ -124,13 +140,13 @@ public class DBConnection {
                 pst.setString(7, null);
                 pst.setString(8, tp.GetMainCategory());    
             }
-            else if(pm instanceof VegetangleFruitModel){
+            else if(pm instanceof VegetangleFruitModel ){
                 pst.setString(5, null);
                 pst.setString(6, null);
                 pst.setString(7, null);
                 pst.setString(8, pm.GetMainCategory());
             }
-            else if(pm instanceof ClothesModel){
+            else if(pm instanceof ClothesModel ){
                 ClothesModel cm = (ClothesModel)pm;
                 pst.setString(5, null);
                 pst.setString(6, null);

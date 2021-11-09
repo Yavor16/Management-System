@@ -20,6 +20,7 @@ public class ClothesEditController extends EditProductController{
     public void initialize(URL url, ResourceBundle rb) {
         super.initialize(url, rb);
         chosenProduct = (ClothesModel)selectedProd;
+        sizeText.setText(chosenProduct.GetSize());
     }
     @Override
     public void UpdateProduct(ActionEvent e) throws SQLException {

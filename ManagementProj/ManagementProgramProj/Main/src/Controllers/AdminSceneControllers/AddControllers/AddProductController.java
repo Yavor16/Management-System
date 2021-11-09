@@ -43,17 +43,8 @@ public abstract class AddProductController implements Initializable{
         try{
             DBConnection.GetProducts();
             if (DoesListContainProduct(nameText.getText())) {
-                int arrSize = AdminMainSceneController.listOfProducts.size();
-                
-                for (int i = 0; i < arrSize; i++) {
-                    ProductModel prod = AdminMainSceneController.listOfProducts.get(i);
-                    if (prod.GetName().equals(nameText.getText()) ) {
-
-                        prod.SetQuantity(prod.GetQuantity() + quantity);       
-                        DBConnection.UpdateProduct(prod);
-                        break;
-                    }
-                }
+                alert.setContentText("Change the name because this name already exists");
+                alert.show();
             }
             else{   
                 DBConnection.AddProduct(pModel);
@@ -138,9 +129,10 @@ public abstract class AddProductController implements Initializable{
         return true;
     }
     //Object key;
-    int GetLastIndex(){
+    int GetLastIndex() throws SQLException{
+        DBConnection.GetProducts();
         int id = 0;
-        if (!DBConnection.product.isEmpty()) {
+        if (!DBConnection.product.isEmpty()) {            
             Object key = DBConnection.product.keySet().toArray()[DBConnection.product.size() - 1]; 
             id = DBConnection.product.get(key).GetID() + 1;
         }

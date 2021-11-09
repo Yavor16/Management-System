@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
+
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -23,13 +24,29 @@ public class ChooseCategoryController implements Initializable{
     
     List<String> parentsList = new ArrayList<>();
 
+    public static String[][] technologyCategories = {
+        {"Laptop", "TV", "Monitor", "Tablet"},
+        {"Samsung", "Huawei", "Tablet"}
+    };
+    public static String[][] foodCategories = {
+        {"Tomato", "Onion", "Cucumber", "Garlic", "Pumkin"},
+        {"Orange", "Apple", "Peach", "Mango", "Banana"}
+    };
+    public static String[][] clothCategories = {
+        {"T-Shirt", "Shorts", "Sandals", "Hawaiian shirt", "Jeans"},
+        {"Skirt", "Bra", "Dress", "Sheath dress", "Hoodie"},
+        {"Bodysuit","Romper","Sleepsuits","Babygrow"}
+    };
     public static String chosenCategory;
 
     public void initialize(URL url, ResourceBundle rb ){
 
         TreeItem<String>categories = new TreeItem<>("Categories");
 
-        categories.getChildren().addAll(InitializeTechnologyCateg(), InitializeVegAndFruitCateg(), InitializeClothes());
+        categories.getChildren().add(InitializeTechnologyCateg());
+        categories.getChildren().add(InitializeVegAndFruitCateg());
+        categories.getChildren().add(InitializeClothes());
+        
 
         categories.setExpanded(true);
         categoryView.setShowRoot(false);
@@ -38,26 +55,28 @@ public class ChooseCategoryController implements Initializable{
     }
     TreeItem<String> InitializeTechnologyCateg(){
         TreeItem<String>technology = new TreeItem<>("Technology");
-        TreeItem<String>blackTechnology = new TreeItem<>("Black Technology");
-        TreeItem<String>whiteTechnology = new TreeItem<>("White Technology");
         
-        TreeItem<String>laptop = new TreeItem<>("Laptop");
-        TreeItem<String>tv = new TreeItem<>("TV");
-        TreeItem<String>monitor = new TreeItem<>("Monitor");
-        TreeItem<String>smartphone = new TreeItem<>("Smartphone");
-        TreeItem<String>tablet = new TreeItem<>("Tablet");
+        TreeItem<String>other = new TreeItem<>("Other Technologies");
+        TreeItem<String>smarthphones = new TreeItem<>("Smarthphone");
         
-        TreeItem<String>microwave = new TreeItem<String>("Microwave");
-        TreeItem<String>grill = new TreeItem<String>("Grill");
-        TreeItem<String>oven = new TreeItem<String>("Oven");
-        
-        whiteTechnology.getChildren().addAll(microwave, grill, oven);
-        blackTechnology.getChildren().addAll(laptop, tv, monitor, smartphone, tablet);
-        technology.getChildren().addAll(blackTechnology,whiteTechnology);
+        for (int i = 0; i < technologyCategories.length; i++) {
+            for (int j = 0; j < technologyCategories[i].length; j++) {
+                TreeItem<String>item = new TreeItem<>(technologyCategories[i][j]);
+                if (i == 0) {
+                    other.getChildren().add(item);
+                }
+                else{
+                    smarthphones.getChildren().add(item);
+                }
+            }
+        }
+
+        technology.getChildren().add(other);
+        technology.getChildren().add(smarthphones);
 
         parentsList.add(technology.getValue());
-        parentsList.add(blackTechnology.getValue());
-        parentsList.add(whiteTechnology.getValue());
+        parentsList.add(smarthphones.getValue());
+        parentsList.add(other.getValue());
 
         return technology;
     }
@@ -67,63 +86,59 @@ public class ChooseCategoryController implements Initializable{
         TreeItem<String>vegetables = new TreeItem<>("Vegetables");
         TreeItem<String>fruit = new TreeItem<>("Fruit");
         
-        TreeItem<String>tomato = new TreeItem<>("Tomato");
-        TreeItem<String>onion = new TreeItem<>("Onion");
-        TreeItem<String>cucumber = new TreeItem<>("Cucumber");
-        TreeItem<String>garlic = new TreeItem<>("Garlic");
-        TreeItem<String>pumkin = new TreeItem<>("Pumkin");
-        
-        TreeItem<String>orange = new TreeItem<>("Orange");
-        TreeItem<String>apple = new TreeItem<>("Apple");
-        TreeItem<String>peach = new TreeItem<>("Peach");
-        TreeItem<String>mango = new TreeItem<>("Mango");
-        TreeItem<String>banana = new TreeItem<>("Banana");
-        
+        for (int i = 0; i < foodCategories.length; i++) {
+            for (int j = 0; j < foodCategories[i].length; j++) {
+                TreeItem<String>item = new TreeItem<>(foodCategories[i][j]);
+                if (i == 0) {
+                    vegetables.getChildren().add(item);
+                }
+                else{
+                    fruit.getChildren().add(item);
+                }
+            }
+        }
 
         parentsList.add(food.getValue());
         parentsList.add(vegetables.getValue());
         parentsList.add(fruit.getValue());
 
-        vegetables.getChildren().addAll(tomato, onion, cucumber, garlic, pumkin);
-        fruit.getChildren().addAll(orange, apple, peach, mango, banana);
 
-        food.getChildren().addAll(vegetables,fruit);
+        food.getChildren().add(fruit);
+        food.getChildren().add(vegetables);
 
         return food;
     }
+    
     TreeItem<String> InitializeClothes(){
         TreeItem<String>clothes = new TreeItem<>("Clothes");
         TreeItem<String>male = new TreeItem<>("Male");
         TreeItem<String>female = new TreeItem<>("Female");
         TreeItem<String>kid = new TreeItem<>("Kid");
         
-        TreeItem<String>tshirt = new TreeItem<>("T-Shirt");
-        TreeItem<String>shorts = new TreeItem<>("Shorts");
-        TreeItem<String>sandals = new TreeItem<>("Sandals");
-        TreeItem<String>hawaiianshirt = new TreeItem<>("Hawaiian shirt");
-        TreeItem<String>jeans = new TreeItem<>("Jeans");
-        
-        TreeItem<String>skirt = new TreeItem<>("Skirt");
-        TreeItem<String>bra = new TreeItem<>("Bra");
-        TreeItem<String>dress = new TreeItem<>("Dress");
-        TreeItem<String>sheathdress = new TreeItem<>("Sheath dress");
-        TreeItem<String>hoodie = new TreeItem<>("Hoodie");
-        
-        TreeItem<String>bodysuit = new TreeItem<>("Bodysuit");
-        TreeItem<String>romper = new TreeItem<>("Romper");
-        TreeItem<String>sleesuits = new TreeItem<>("Sleepsuits");
-        TreeItem<String>babygrow = new TreeItem<>("Babygrow");
+        for (int i = 0; i < clothCategories.length; i++) {
+            for (int j = 0; j < clothCategories[i].length; j++) {
+                TreeItem<String>item = new TreeItem<>(clothCategories[i][j]);
+                if (i == 0) {
+                    male.getChildren().add(item);
+                }
+                else if (i == 1){
+                    female.getChildren().add(item);
+                }
+                else{
+                    kid.getChildren().add(item);
+                }
+            }
+        }
 
         parentsList.add(clothes.getValue());
         parentsList.add(male.getValue());
         parentsList.add(female.getValue());
         parentsList.add(kid.getValue());
-        //ObservableList l = new JSO
-        male.getChildren().addAll(tshirt, shorts, sandals, hawaiianshirt, jeans);
-        female.getChildren().addAll(skirt, bra, dress, sheathdress, hoodie);
-        kid.getChildren().addAll(bodysuit, romper, sleesuits, babygrow);
+       
+        clothes.getChildren().add(male);
+        clothes.getChildren().add(female);
+        clothes.getChildren().add(kid);
 
-        clothes.getChildren().addAll(male,female, kid);
         return clothes;
     }
     
