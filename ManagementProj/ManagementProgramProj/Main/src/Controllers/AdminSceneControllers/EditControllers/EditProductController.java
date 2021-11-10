@@ -55,12 +55,12 @@ public abstract class EditProductController implements Initializable{
                 //AdminMainSceneController.listOfProducts.add(pModel);
                 alert.setTitle("Update");
                 alert.setContentText(selectedProd.GetName() + " updated!");
-                alert.showAndWait();
+                alert.show();
 
-        }catch(Exception exe){
+        } catch(Exception exe){
             alert.setTitle("New product");
             alert.setContentText(exe.getLocalizedMessage());
-            alert.showAndWait();
+            alert.show();
         }
     }
     public void CancelProduct(ActionEvent e ){
@@ -74,13 +74,12 @@ public abstract class EditProductController implements Initializable{
             try{
                 quantity = Integer.parseInt(quantityText.getText());
                 return true;
-            }catch(Exception e){
+            } catch(Exception e){
                 alert.setContentText("Enter smaller quantity!");
                 alert.showAndWait();
                 return false;
             }
-        }
-        else{
+        } else{
             alert.setContentText("Quantity: Enter only numbers");
             alert.showAndWait();
             return false;
@@ -92,8 +91,7 @@ public abstract class EditProductController implements Initializable{
             price = Float.parseFloat(priceText.getText());
             price = Math.round(price);
             return true;
-        }
-        catch(Exception e){
+        } catch(Exception e){
             alert.setTitle("Error");
             alert.setContentText("Price: Enter only numbers");
             alert.showAndWait();

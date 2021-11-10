@@ -32,6 +32,7 @@ public class BasketController implements Initializable{
     void AddProdToBasket(int amount, ProductModel prod){
         TextField text = new TextField();
         text.setText(prod.GetName() +" "+ amount +"x" + prod.GetPrice());
+        text.setEditable(false);
         vBox.getChildren().add(text);
     }
     
@@ -44,6 +45,7 @@ public class BasketController implements Initializable{
         stage.setScene(scene);
         stage.showAndWait();
         MainScene.basketItems.clear();
+        
         stage = (Stage)((Node)e.getSource()).getScene().getWindow();
         stage.close();
 

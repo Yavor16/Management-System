@@ -64,8 +64,7 @@ public class ChooseCategoryController implements Initializable{
                 TreeItem<String>item = new TreeItem<>(technologyCategories[i][j]);
                 if (i == 0) {
                     other.getChildren().add(item);
-                }
-                else{
+                } else{
                     smarthphones.getChildren().add(item);
                 }
             }
@@ -91,8 +90,7 @@ public class ChooseCategoryController implements Initializable{
                 TreeItem<String>item = new TreeItem<>(foodCategories[i][j]);
                 if (i == 0) {
                     vegetables.getChildren().add(item);
-                }
-                else{
+                } else{
                     fruit.getChildren().add(item);
                 }
             }
@@ -120,11 +118,9 @@ public class ChooseCategoryController implements Initializable{
                 TreeItem<String>item = new TreeItem<>(clothCategories[i][j]);
                 if (i == 0) {
                     male.getChildren().add(item);
-                }
-                else if (i == 1){
+                } else if (i == 1){
                     female.getChildren().add(item);
-                }
-                else{
+                } else{
                     kid.getChildren().add(item);
                 }
             }
@@ -164,14 +160,6 @@ public class ChooseCategoryController implements Initializable{
             stage = (Stage)categoryView.getScene().getWindow();
             stage.close();
         }
-    } 
-    Boolean IsParentSelected(TreeItem<String> item){
-        for(String categ: parentsList){
-            if (item.getValue() == categ) {
-                return true;
-            }
-        }
-        return false;            
     }
     Scene CreateScene(String fileName) throws IOException{
         URL url = new File("Main/src/Scenes/AdminScenes/" + fileName + ".fxml").toURI().toURL();

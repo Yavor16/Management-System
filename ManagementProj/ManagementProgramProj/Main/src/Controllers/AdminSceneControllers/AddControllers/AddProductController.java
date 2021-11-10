@@ -45,18 +45,16 @@ public abstract class AddProductController implements Initializable{
             if (DoesListContainProduct(nameText.getText())) {
                 alert.setContentText("Change the name because this name already exists");
                 alert.show();
-            }
-            else{   
+            } else{   
                 DBConnection.AddProduct(pModel);
-                AdminMainSceneController.listOfProducts.add(new ProductModel(GetLastIndex(), nameText.getText(), ChooseCategoryController.chosenCategory, quantity, price));
+                AdminMainSceneController.listOfProducts.add(new ProductModel(GetLastIndex() - 1, nameText.getText(), ChooseCategoryController.chosenCategory, quantity, price));
                 alert.setTitle("New product");
                 alert.setHeaderText("");
                 alert.setContentText("Product added!");
                 alert.show();
             }
             
-        }
-        catch(Exception exe){
+        } catch(Exception exe){
             alert.setContentText(exe.getLocalizedMessage());
             alert.show();
         }
@@ -86,14 +84,12 @@ public abstract class AddProductController implements Initializable{
                     alert.show();
                     return false;
                 }
-            }
-            else{
+            } else{
                 alert.setContentText("Quantity: Enter only numbers");
                 alert.show();
                 return false;
             }
-        }
-        else{
+        } else{
             alert.setContentText("Quantity: Field cannot be empty!");
             alert.show();
             return false;
@@ -105,16 +101,13 @@ public abstract class AddProductController implements Initializable{
                 price = Float.parseFloat(priceText.getText());
                 price = Math.round(price);
                 return true;
-            }
-            catch(Exception e){
+            } catch(Exception e){
                
                 alert.setContentText("Price: Enter only numbers");
                 alert.show();
                 return false;
             }
-        }
-        else{
-            
+        } else{
             alert.setContentText("Price: Field cannot be empty!");
             alert.show();
             return false;

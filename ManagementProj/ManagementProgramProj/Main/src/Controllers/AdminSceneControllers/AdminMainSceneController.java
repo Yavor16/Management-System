@@ -95,20 +95,20 @@ public class AdminMainSceneController implements Initializable{
         selectedProduct = productsTableView.getSelectionModel().getSelectedItem(); 
 
         stage = new Stage();
+        DBConnection.GetProducts();
         DBConnection.GetSpecificProduct(selectedProduct.GetID());
         String mainCat = DBConnection.wantedProd.GetMainCategory(); 
         
+        //String mainCat = selectedProduct.GetMainCategory();
         if (mainCat.equals("Technology")) {
             TechnologyProductModel tm = (TechnologyProductModel)DBConnection.wantedProd; 
             selectedProduct = tm;
             stage.setScene(CreateScene("TechnologyEditScene"));
-        }
-        else if (mainCat.equals("Food")) {
+        } else if (mainCat.equals("Food")) {
             VegetangleFruitModel fm = (VegetangleFruitModel)DBConnection.wantedProd;
             selectedProduct= fm;
             stage.setScene(CreateScene("FoodEditScene"));
-        }
-        else if(mainCat.equals("Clothes")){
+        } else if(mainCat.equals("Clothes")){
             ClothesModel cm = (ClothesModel)DBConnection.wantedProd;
             selectedProduct = cm;
             stage.setScene(CreateScene("ClothesEditScene"));
@@ -131,8 +131,7 @@ public class AdminMainSceneController implements Initializable{
             DBConnection.DeleteProduct(selectedProduct.GetID());
             listOfProducts.remove(listOfProducts.indexOf(selectedProduct));
             UpdateTableView();
-        }
-        else{
+        } else{
             confirmDiag.close();
         }
     }
@@ -142,8 +141,7 @@ public class AdminMainSceneController implements Initializable{
 
             if (searchComboBox.getValue().toString() == "All products" ){
                 productsTableView.setItems(listOfProducts);
-            }
-            else{
+            } else{
                 productsTableView.setItems(GetComboBoxSearchResults());
             }
             productsTableView.refresh();
@@ -161,6 +159,7 @@ public class AdminMainSceneController implements Initializable{
         searchComboBox.setItems(comboBoxItems);
     }
     public void SearchUsingComboBox(ActionEvent e) throws SQLException{
+        SetListOfProducts();
         UpdateTableView();
     }
     public void CloseWindow(ActionEvent e) throws IOException{
@@ -173,8 +172,9 @@ public class AdminMainSceneController implements Initializable{
         stage.setScene(scene);
         stage.show();
     }
-    ObservableList<ProductModel> GetComboBoxSearchResults(){
+    ObservableList<ProductModel> GetComboBoxSearchResults() throws SQLException{
         ObservableList<ProductModel> searchResultList = FXCollections.observableArrayList();
+        
 
         for (ProductModel prod : listOfProducts){
             if(prod.GetMainCategory().equals(searchComboBox.getValue().toString()) ){

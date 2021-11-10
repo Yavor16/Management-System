@@ -55,15 +55,13 @@ public class DBConnection {
                                                             rs.getFloat("price"), 
                                                             rs.getString("resolution"), 
                                                             rs.getBoolean("used"));
-            }
-            else if (rs.getString("maincategory").equals("Food")) {
+            } else if (rs.getString("maincategory").equals("Food")) {
                 currentProduct = new VegetangleFruitModel(rs.getInt("id"), 
                                                         rs.getString("name"), 
                                                         rs.getString("category"), 
                                                         rs.getInt("quantity"), 
                                                         rs.getFloat("price"));
-            }
-            else{
+            } else{
                 currentProduct = new ClothesModel(rs.getInt("id"), 
                                                     rs.getString("name"), 
                                                     rs.getString("category"), 
@@ -91,14 +89,12 @@ public class DBConnection {
             pst.setInt(7, isUsed);
             pst.setString(8, null);
             pst.setString(9, tp.GetMainCategory());    
-        }
-        else if(pm instanceof VegetangleFruitModel){
+        } else if(pm instanceof VegetangleFruitModel){
             pst.setString(6, null);
             pst.setString(7, null);
             pst.setString(8, null);
             pst.setString(9, "Food");
-        }
-        else if(pm instanceof ClothesModel){
+        } else if(pm instanceof ClothesModel){
             ClothesModel cm = (ClothesModel)pm;
             pst.setString(6, null);
             pst.setString(7, null);
@@ -113,8 +109,7 @@ public class DBConnection {
             pst = dbConnection.prepareStatement("delete from product where id= ?");
             pst.setInt(1, id);
             pst.executeUpdate();
-        }
-        catch(Exception exe){
+        } catch(Exception exe){
             alert.setTitle("Error");;
             alert.setContentText(exe.getLocalizedMessage());
             alert.showAndWait();
@@ -139,14 +134,12 @@ public class DBConnection {
                 pst.setInt(6, isUsed);
                 pst.setString(7, null);
                 pst.setString(8, tp.GetMainCategory());    
-            }
-            else if(pm instanceof VegetangleFruitModel ){
+            } else if(pm instanceof VegetangleFruitModel ){
                 pst.setString(5, null);
                 pst.setString(6, null);
                 pst.setString(7, null);
                 pst.setString(8, pm.GetMainCategory());
-            }
-            else if(pm instanceof ClothesModel ){
+            } else if(pm instanceof ClothesModel ){
                 ClothesModel cm = (ClothesModel)pm;
                 pst.setString(5, null);
                 pst.setString(6, null);
@@ -155,8 +148,7 @@ public class DBConnection {
             }
             pst.executeUpdate();
 
-        }
-        catch(Exception exe){          
+        } catch(Exception exe){          
             alert.setTitle("Error");;
             alert.setContentText(exe.getLocalizedMessage());
             alert.showAndWait();
@@ -165,7 +157,8 @@ public class DBConnection {
     public static ProductModel wantedProd;
 
     public static void GetSpecificProduct(int id) throws SQLException{
-        final String SQL = "SELECT * FROM product where id=" + id;
+        System.out.println(id);
+        final String SQL = "SELECT * FROM product where id=" + id ;
         final ResultSet rs = dbConnection.createStatement().executeQuery(SQL);
         wantedProd = null;
 
@@ -179,15 +172,14 @@ public class DBConnection {
                                                         rs.getFloat("price"),
                                                         rs.getString("resolution"),
                                                         rs.getBoolean("used")); 
-            }
+            } 
             else if(category.equals("Food")){
                 wantedProd = new VegetangleFruitModel(rs.getInt("id"), 
                                                         rs.getString("name"), 
                                                         rs.getString("category"), 
                                                         rs.getInt("quantity"), 
                                                         rs.getFloat("price"));
-            }
-            else if(category.equals("Clothes")){
+            } else if(category.equals("Clothes")){
                 wantedProd = new ClothesModel(rs.getInt("id"), 
                                                 rs.getString("name"), 
                                                 rs.getString("category"), 

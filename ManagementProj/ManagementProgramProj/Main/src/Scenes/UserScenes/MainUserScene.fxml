@@ -9,7 +9,6 @@
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 
-
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="460.0" prefWidth="600.0" style="-fx-background-color: #333;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controllers.UserSceneControllers.MainScene">
    <children>
       <BorderPane layoutX="-6.0" layoutY="-3.0" prefHeight="47.0" prefWidth="607.0" style="-fx-border-color: WHITE; -fx-border-width: 0 0 1 0;">
@@ -18,19 +17,16 @@
                <right>
                   <Button fx:id="historyBttn" mnemonicParsing="false" onAction="#ShowHistory" text="History" BorderPane.alignment="CENTER" />
                </right>
-               <center>
-                  <Button fx:id="allProductsBttn" mnemonicParsing="false" onAction="#ShowAllProdcuts" text="All Products" BorderPane.alignment="CENTER" />
-               </center>
                <BorderPane.margin>
                   <Insets right="15.0" />
                </BorderPane.margin>
-               <left>
+               <center>
                   <Button fx:id="basketBttn" mnemonicParsing="false" onAction="#OpenBasket" text="Basket" BorderPane.alignment="CENTER" />
-               </left>
+               </center>
             </BorderPane>
          </right>
          <center>
-            <TextField fx:id="searchTextField" onAction="#SearchForProduct" prefHeight="25.0" prefWidth="116.0" style="-fx-max-width: 150;" BorderPane.alignment="CENTER" />
+            <TextField fx:id="searchTextField" prefHeight="25.0" prefWidth="116.0" promptText="Search name or category" style="-fx-max-width: 150;" BorderPane.alignment="CENTER" />
          </center>
          <left>
             <Button fx:id="backBttn" mnemonicParsing="false" onAction="#OpenOpenScene" text="Back" BorderPane.alignment="CENTER">
@@ -40,9 +36,9 @@
             </Button>
          </left>
       </BorderPane>
-      <ScrollPane layoutX="14.0" layoutY="66.0" prefHeight="380.0" prefWidth="573.0">
+      <ScrollPane layoutX="14.0" layoutY="66.0" prefHeight="380.0" prefWidth="573.0" style="-fx-background-color: gray;">
          <content>
-            <GridPane fx:id="productsGrid" prefHeight="0.0" prefWidth="0.0">
+            <GridPane fx:id="productsGrid" prefHeight="0.0" prefWidth="0.0" style="-fx-background-color: gray;">
               <columnConstraints>
                 <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                 <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
