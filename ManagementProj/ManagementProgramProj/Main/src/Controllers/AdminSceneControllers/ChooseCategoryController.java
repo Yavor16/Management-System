@@ -26,10 +26,10 @@ public class ChooseCategoryController implements Initializable{
 
     public static String[][] technologyCategories = {
         {"Laptop", "TV", "Monitor", "Tablet"},
-        {"Samsung", "Huawei", "Tablet"}
+        {"Samsung", "Huawei", "Nokia"}
     };
     public static String[][] foodCategories = {
-        {"Tomato", "Onion", "Cucumber", "Garlic", "Pumkin"},
+        {"Tomato", "Onion", "Cucumber", "Garlic", "Pumpkin"},
         {"Orange", "Apple", "Peach", "Mango", "Banana"}
     };
     public static String[][] clothCategories = {
