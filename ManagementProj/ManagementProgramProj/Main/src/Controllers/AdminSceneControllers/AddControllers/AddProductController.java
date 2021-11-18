@@ -16,7 +16,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Stage;
 import javafx.scene.Node;
-public abstract class AddProductController implements Initializable{
+public class AddProductController implements Initializable{
 
     @FXML
     TextField nameText;
@@ -37,7 +37,19 @@ public abstract class AddProductController implements Initializable{
         alert.setTitle("Error");
         alert.setHeaderText(""); 
     }
-    public abstract void AddProduct(ActionEvent e)throws SQLException ;
+    public void AddProduct(ActionEvent e)throws SQLException {
+        if(SetName() && SetQuantity() && SetPrice()){
+            ProductModel pModel = new ProductModel(GetLastIndex(), 
+                                                    nameText.getText(), 
+                                                    category, 
+                                                    quantity, 
+                                                    price);
+            pModel.SetMainCategory(ChooseCategoryController.selcectedItemMainCategory);
+            AddProductToDB(pModel);
+            stage = (Stage)((Node)e.getSource()).getScene().getWindow();
+            stage.close();
+        }
+    }
 
     void AddProductToDB(ProductModel pModel){
         try{

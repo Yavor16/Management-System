@@ -16,11 +16,11 @@ public class AddClothesController extends AddProductController {
     public void AddProduct(ActionEvent e) throws SQLException {
         if(SetName() && SetQuantity() && SetPrice() && SetSize()){
             ClothesModel pModel = new ClothesModel(GetLastIndex(), 
-                                                                        nameText.getText(), 
-                                                                        category, 
-                                                                        quantity, 
-                                                                        price,
-                                                                        sizeText.getText());
+                                                    nameText.getText(), 
+                                                    category, 
+                                                    quantity, 
+                                                    price,
+                                                    sizeText.getText());
             AddProductToDB(pModel);
             stage = (Stage)((Node)e.getSource()).getScene().getWindow();
             stage.close();

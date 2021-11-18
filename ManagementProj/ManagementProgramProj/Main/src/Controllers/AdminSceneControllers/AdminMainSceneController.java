@@ -7,7 +7,6 @@ import java.sql.SQLException;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
-
 import Models.ClothesModel;
 import Models.ProductModel;
 import Models.TechnologyProductModel;
@@ -68,38 +67,49 @@ public class AdminMainSceneController implements Initializable{
     @FXML
     ComboBox<String> searchComboBox;
     /************************************/
+
+    //ChooseCategoryController pInfoController;
+
     @Override 
     public void initialize(URL url, ResourceBundle rb ){
         listOfProducts = FXCollections.observableArrayList();
         searchComboBox.setValue("All products");
-        InitializeComboBox();
+        
         try {
+            GetCategoryController();
+            InitializeComboBox();
             DBConnection.GetProducts();
             UpdateTableView();
             AddDataToTableView();
-        } catch (SQLException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
-
-    public void OpenAddProductScene(ActionEvent e) throws IOException, SQLException{
+    public void OpenAddProductScene(ActionEvent e) throws IOException, SQLException, ClassNotFoundException{
 
         stage = new Stage();
         stage.setScene(CreateScene("ChooseCategoryScene"));
-
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.showAndWait();
         UpdateTableView();
+        InitializeComboBox();
     }
+    void GetCategoryController() throws IOException{
+        URL  url = new File("Main/src/Scenes/AdminScenes/ChooseCategoryScene.fxml").toURI().toURL();
+        FXMLLoader loader = new FXMLLoader(url);
+        root = loader.load();
+        loader.getController();
+    }
+    public static String mainCat;
+    
     public void OpenEditProductScene(ActionEvent e) throws IOException, SQLException{
         selectedProduct = productsTableView.getSelectionModel().getSelectedItem(); 
 
         stage = new Stage();
         DBConnection.GetProducts();
         DBConnection.GetSpecificProduct(selectedProduct.GetID());
-        String mainCat = DBConnection.wantedProd.GetMainCategory(); 
+        mainCat = DBConnection.wantedProd.GetMainCategory(); 
         
-        //String mainCat = selectedProduct.GetMainCategory();
         if (mainCat.equals("Technology")) {
             TechnologyProductModel tm = (TechnologyProductModel)DBConnection.wantedProd; 
             selectedProduct = tm;
@@ -112,7 +122,12 @@ public class AdminMainSceneController implements Initializable{
             ClothesModel cm = (ClothesModel)DBConnection.wantedProd;
             selectedProduct = cm;
             stage.setScene(CreateScene("ClothesEditScene"));
+        } else{
+            ProductModel pm = (ProductModel)DBConnection.wantedProd;
+            selectedProduct = pm;
+            stage.setScene(CreateScene("EditProductScene"));
         }
+
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.showAndWait();
         
@@ -154,10 +169,12 @@ public class AdminMainSceneController implements Initializable{
         scene = new Scene(root);
         return scene;
     }
-    void InitializeComboBox(){
-        ObservableList<String> comboBoxItems = FXCollections.observableArrayList("Technology", "Food", "Clothes", "All products");
+    void InitializeComboBox() throws IOException, ClassNotFoundException{
+        ObservableList<String> comboBoxItems = FXCollections.observableArrayList(ChooseCategoryController.mainCategoryNames);
+        comboBoxItems.add("All products");
         searchComboBox.setItems(comboBoxItems);
     }
+
     public void SearchUsingComboBox(ActionEvent e) throws SQLException{
         SetListOfProducts();
         UpdateTableView();
@@ -175,7 +192,6 @@ public class AdminMainSceneController implements Initializable{
     ObservableList<ProductModel> GetComboBoxSearchResults() throws SQLException{
         ObservableList<ProductModel> searchResultList = FXCollections.observableArrayList();
         
-
         for (ProductModel prod : listOfProducts){
             if(prod.GetMainCategory().equals(searchComboBox.getValue().toString()) ){
                 searchResultList.add(prod);

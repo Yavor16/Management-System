@@ -61,17 +61,25 @@ public class DBConnection {
                                                         rs.getString("category"), 
                                                         rs.getInt("quantity"), 
                                                         rs.getFloat("price"));
-            } else{
+            } else if (rs.getString("maincategory").equals("Clothes")){
                 currentProduct = new ClothesModel(rs.getInt("id"), 
                                                     rs.getString("name"), 
                                                     rs.getString("category"), 
                                                     rs.getInt("quantity"), 
                                                     rs.getFloat("price"), 
                                                     rs.getString("size"));
+            } else{
+                currentProduct = new ProductModel(rs.getInt("id"), 
+                                                        rs.getString("name"), 
+                                                        rs.getString("category"), 
+                                                        rs.getInt("quantity"), 
+                                                        rs.getFloat("price"));
+                currentProduct.SetMainCategory(rs.getString("maincategory"));
             }
             product.put(currentProduct.GetID(), currentProduct); 
         }
     }
+    
     public static void AddProduct(ProductModel pm) throws SQLException{
         
         pst = dbConnection.prepareStatement("insert into product(id,name,category,price,quantity,resolution,used,size,maincategory)values(?,?,?,?,?,?,?,?,?)");
@@ -100,6 +108,11 @@ public class DBConnection {
             pst.setString(7, null);
             pst.setString(8, cm.GetSize());
             pst.setString(9, cm.GetMainCategory());
+        } else{
+            pst.setString(6, null);
+            pst.setString(7, null);
+            pst.setString(8, null);
+            pst.setString(9, pm.GetMainCategory());
         }
         pst.executeUpdate();
     }
@@ -146,6 +159,12 @@ public class DBConnection {
                 pst.setString(7, cm.GetSize());
                 pst.setString(8, cm.GetMainCategory());
             }
+            else{
+                pst.setString(5, null);
+                pst.setString(6, null);
+                pst.setString(7, null);
+                pst.setString(8, pm.GetMainCategory());      
+            }
             pst.executeUpdate();
 
         } catch(Exception exe){          
@@ -186,6 +205,13 @@ public class DBConnection {
                                                 rs.getInt("quantity"), 
                                                 rs.getFloat("price"), 
                                                 rs.getString("size"));
+            } else{
+                wantedProd = new ProductModel(rs.getInt("id"), 
+                                                rs.getString("name"), 
+                                                rs.getString("category"), 
+                                                rs.getInt("quantity"), 
+                                                rs.getFloat("price"));
+                wantedProd.SetMainCategory(category);
             }
         }
     }

@@ -17,7 +17,7 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.Node;
 import javafx.stage.Stage;
 
-public abstract class EditProductController implements Initializable{
+public class EditProductController implements Initializable{
     @FXML
     TextField nameText;
     @FXML
@@ -44,11 +44,22 @@ public abstract class EditProductController implements Initializable{
 
         alert.setHeaderText("");
     }
-    public abstract void UpdateProduct(ActionEvent e) throws SQLException;
+    public void UpdateProduct(ActionEvent e) throws SQLException{
+        if(SetPrice() && SetQuantity()){
+            ProductModel pModel = new ProductModel(selectedProd.GetID(), 
+                                                    selectedProd.GetName(), 
+                                                    selectedProd.GetCategory(), 
+                                                    quantity, 
+                                                    price);
+            pModel.SetMainCategory(AdminMainSceneController.mainCat);
+            UpdateProductToDB(pModel);
+            Stage stage = (Stage)((Node)e.getSource()).getScene().getWindow();
+            stage.close();
+        }
+    }
 
     public void UpdateProductToDB(ProductModel pModel){
         try{
-           
                 DBConnection.UpdateProduct(pModel);
                 AdminMainSceneController.SetListOfProducts();
                 //AdminMainSceneController.listOfProducts.remove((ProductModel)pModel);
