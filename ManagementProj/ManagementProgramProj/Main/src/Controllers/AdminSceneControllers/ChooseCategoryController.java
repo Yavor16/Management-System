@@ -19,8 +19,6 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Group;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -65,8 +63,8 @@ public class ChooseCategoryController implements Initializable{
     ContextMenu CreateContextMenu(){
         ContextMenu contextMenu = new ContextMenu();
         
-        MenuItem addMenuItem = new MenuItem("Add Child");
-        MenuItem deleteMenuItem = new MenuItem("Delete Child");
+        MenuItem addMenuItem = new MenuItem("Add Category");
+        MenuItem deleteMenuItem = new MenuItem("Delete Category");
         
         addMenuItem.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -224,6 +222,9 @@ public class ChooseCategoryController implements Initializable{
         }
     }
     void DeleteCategory(TreeItem<String> categoryToDel) throws ClassNotFoundException, IOException{
+        if (mainCategoryNames.contains(categoryToDel.getValue())) {
+            mainCategoryNames.remove(categoryToDel.getValue());
+        }
         for (int i = 0; i < categoryToDel.getChildren().size(); i++) {
             categoryToDel.getChildren().remove(categoryToDel.getChildren().get(i));
         }
@@ -233,7 +234,6 @@ public class ChooseCategoryController implements Initializable{
         f.delete();
         SaveCategories(categories, "root");
         LoadCategories();
-        GetMainCategories();
     }
     public void GetMainCategories(){
         mainCategoryNames.clear();

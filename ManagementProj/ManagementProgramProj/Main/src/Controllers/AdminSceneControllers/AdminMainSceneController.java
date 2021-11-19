@@ -76,7 +76,6 @@ public class AdminMainSceneController implements Initializable{
         searchComboBox.setValue("All products");
         
         try {
-            GetCategoryController();
             InitializeComboBox();
             DBConnection.GetProducts();
             UpdateTableView();
@@ -170,6 +169,8 @@ public class AdminMainSceneController implements Initializable{
         return scene;
     }
     void InitializeComboBox() throws IOException, ClassNotFoundException{
+        GetCategoryController();
+        //searchComboBox.getItems().clear();
         ObservableList<String> comboBoxItems = FXCollections.observableArrayList(ChooseCategoryController.mainCategoryNames);
         comboBoxItems.add("All products");
         searchComboBox.setItems(comboBoxItems);
