@@ -1,3 +1,14 @@
-Categories=root
-Toys=Categories
+Laptop=Technology
+Lenovo=Laptop
 Technology=Categories
+Kid=Clothes
+Snearkers=Kid
+Man=Clothes
+T-Shirt=Man
+Woman=Clothes
+Bra=Woman
+Clothes=Categories
+Categories=root
+Household=Categories
+Toys=Categories
+Food=Categories
