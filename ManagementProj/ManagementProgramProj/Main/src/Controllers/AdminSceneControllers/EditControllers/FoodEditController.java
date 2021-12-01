@@ -1,9 +1,9 @@
 package Controllers.AdminSceneControllers.EditControllers;
 
 import java.net.URL;
-import java.sql.SQLException;
 import java.util.ResourceBundle;
 
+import Models.ProductModel;
 import Models.VegetangleFruitModel;
 import javafx.event.ActionEvent;
 import javafx.stage.Stage;
@@ -19,19 +19,23 @@ public class FoodEditController extends EditProductController{
         chosenProduct = (VegetangleFruitModel)selectedProd;
     }
     @Override
-    public void UpdateProduct(ActionEvent e) throws SQLException {
-        if(SetPrice() && SetQuantity()){
-            VegetangleFruitModel pModel = new VegetangleFruitModel(chosenProduct.GetID(), 
-            chosenProduct.GetName(), 
-            chosenProduct.GetCategory(), 
-            quantity, 
-            price);
+    public void UpdateProduct(ActionEvent e) {
+        if(areAllInputsValid()){
             
-            UpdateProductToDB(pModel);
+            ProductModel newModel = createNewModelForUpdate();
+            updateProductToDB(newModel);
+
             Stage stage = (Stage)((Node)e.getSource()).getScene().getWindow();
             stage.close();
-        }
-        
+        }      
     }
-    
+    @Override
+    protected ProductModel createNewModelForUpdate() {
+        VegetangleFruitModel pModel = new VegetangleFruitModel(chosenProduct.GetID(), 
+                                                                chosenProduct.GetName(), 
+                                                                chosenProduct.GetCategory(), 
+                                                                quantity, 
+                                                                price);
+        return pModel;
+    }
 }

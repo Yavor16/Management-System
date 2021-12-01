@@ -3,9 +3,9 @@ package Controllers.UserSceneControllers;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+import Controllers.ManageBills;
 import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
+import javafx.fxml.*;
 import javafx.scene.Node;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -16,11 +16,11 @@ public class HistoryController implements Initializable{
     
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        if (!MainScene.queueForBill.isEmpty()) {   
-            if (MainScene.queueForBill.size() > 10) {
-                MainScene.queueForBill.remove();
+        if (!ManageBills.bills.isEmpty()) {   
+            if (ManageBills.bills.size() > 10) {
+                ManageBills.bills.remove();
             }
-            for (VBox bill : MainScene.queueForBill) {
+            for (VBox bill : ManageBills.bills) {
                 vBox.getChildren().add(bill);
             }        
         }

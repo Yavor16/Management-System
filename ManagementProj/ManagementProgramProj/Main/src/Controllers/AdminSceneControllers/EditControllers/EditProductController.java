@@ -1,23 +1,20 @@
 package Controllers.AdminSceneControllers.EditControllers;
 
-
 import java.net.URL;
-import java.sql.SQLException;
 import java.util.ResourceBundle;
 
 import Controllers.DBConnection;
 import Controllers.AdminSceneControllers.AdminMainSceneController;
+import Controllers.AdminSceneControllers.TextFieldsChecks;
 import Models.ProductModel;
 import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
-import javafx.scene.control.Alert;
-import javafx.scene.control.TextField;
+import javafx.fxml.*;
+import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.Node;
 import javafx.stage.Stage;
 
-public class EditProductController implements Initializable{
+public class EditProductController extends TextFieldsChecks implements Initializable{
     @FXML
     TextField nameText;
     @FXML
@@ -25,14 +22,11 @@ public class EditProductController implements Initializable{
     @FXML
     TextField priceText;
   
-    ProductModel selectedProd = AdminMainSceneController.selectedProduct; 
-    Alert alert = new Alert(AlertType.INFORMATION);
+    protected ProductModel selectedProd = AdminMainSceneController.selectedProduct; 
+    protected Alert alert = new Alert(AlertType.INFORMATION);
 
-    String selectedCategory;
-    float price;
-    int quantity;
-    ProductModel productToAdd;
-    int selectedProductID = AdminMainSceneController.listOfProducts.indexOf(selectedProd);
+    protected float price;
+    protected int quantity;
 
     @Override
     public void initialize(URL url, ResourceBundle rb){
@@ -44,69 +38,44 @@ public class EditProductController implements Initializable{
 
         alert.setHeaderText("");
     }
-    public void UpdateProduct(ActionEvent e) throws SQLException{
-        if(SetPrice() && SetQuantity()){
-            ProductModel pModel = new ProductModel(selectedProd.GetID(), 
-                                                    selectedProd.GetName(), 
-                                                    selectedProd.GetCategory(), 
-                                                    quantity, 
-                                                    price);
-            pModel.SetMainCategory(AdminMainSceneController.mainCat);
-            UpdateProductToDB(pModel);
+    public void UpdateProduct(ActionEvent e) {
+        if(areAllInputsValid()){
+            
+            ProductModel newModel = createNewModelForUpdate();
+            updateProductToDB(newModel);
+            
             Stage stage = (Stage)((Node)e.getSource()).getScene().getWindow();
             stage.close();
         }
     }
+    protected ProductModel createNewModelForUpdate(){
+        setVariablesValues();
+        ProductModel pModel = new ProductModel(selectedProd.GetID(), 
+                                                selectedProd.GetName(), 
+                                                selectedProd.GetCategory(), 
+                                                quantity, 
+                                                price);
+        pModel.SetMainCategory(AdminMainSceneController.mainCat);
 
-    public void UpdateProductToDB(ProductModel pModel){
-        try{
-                DBConnection.UpdateProduct(pModel);
-                AdminMainSceneController.SetListOfProducts();
-                //AdminMainSceneController.listOfProducts.remove((ProductModel)pModel);
-                //AdminMainSceneController.listOfProducts.add(pModel);
-                alert.setTitle("Update");
-                alert.setContentText(selectedProd.GetName() + " updated!");
-                alert.show();
-
-        } catch(Exception exe){
-            alert.setTitle("New product");
-            alert.setContentText(exe.getLocalizedMessage());
-            alert.show();
-        }
+        return pModel;
+    }
+    public void updateProductToDB(ProductModel pModel){    
+        DBConnection.updateProduct(pModel);
+        
+        alert.setTitle("Update");
+        alert.setContentText(selectedProd.GetName() + " updated!");
+        alert.show();
+    }
+    @Override
+    protected Boolean areAllInputsValid() {
+        return isQuantityTextValid(quantityText) && isPriceTextValid(priceText);
     }
     public void CancelProduct(ActionEvent e ){
         Stage stage = (Stage)((Node)e.getSource()).getScene().getWindow();
         stage.close();
     }
-    Boolean SetQuantity(){
-        alert.setTitle("Error");
-
-        if(quantityText.getText().matches("[0-9]+")){
-            try{
-                quantity = Integer.parseInt(quantityText.getText());
-                return true;
-            } catch(Exception e){
-                alert.setContentText("Enter smaller quantity!");
-                alert.showAndWait();
-                return false;
-            }
-        } else{
-            alert.setContentText("Quantity: Enter only numbers");
-            alert.showAndWait();
-            return false;
-        }
-    }
-    Boolean SetPrice(){
-        
-        try{
-            price = Float.parseFloat(priceText.getText());
-            price = Math.round(price);
-            return true;
-        } catch(Exception e){
-            alert.setTitle("Error");
-            alert.setContentText("Price: Enter only numbers");
-            alert.showAndWait();
-            return false;
-        }
+    protected void setVariablesValues() {
+        price = Float.parseFloat(priceText.getText());
+        quantity = Integer.parseInt(quantityText.getText());
     }
 }

@@ -1,36 +1,16 @@
 package Controllers.AdminSceneControllers;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
+import java.util.*;
+import java.io.*;
 
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.fxml.Initializable;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TreeItem;
-import javafx.scene.control.TreeView;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.*;
+import javafx.scene.input.*;
+import javafx.scene.*;
+import javafx.event.*;
+import javafx.stage.*;
+import javafx.fxml.*;
 
 public class ChooseCategoryController implements Initializable{
     @FXML
@@ -40,19 +20,18 @@ public class ChooseCategoryController implements Initializable{
     @FXML
     TextField categoryName;
 
-    static List<TreeItem<String>> parentsList = new ArrayList<>();
-    static TreeItem<String>categories;
-    static List<String>mainCategoryNames = new ArrayList<>();
-    TreeItem<String> selectedItem;
+    private static List<TreeItem<String>> parentsList = new ArrayList<>();
+    private static TreeItem<String>categories;
+    static List<String> mainCategoryNames = new ArrayList<>();
+    private TreeItem<String> selectedItem;
     public static String chosenCategory;
+    public static String selcectedItemMainCategory;
+    private Alert alert = new Alert(AlertType.ERROR);
 
     public void initialize(URL url, ResourceBundle rb ){
-        try {
-            LoadCategories();
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        } 
-        
+
+        loadCategories();
+
         categoryView.setContextMenu(CreateContextMenu());
         categoryView.setRoot(categories);
         categories.setExpanded(true);
@@ -77,19 +56,25 @@ public class ChooseCategoryController implements Initializable{
             @Override
             public void handle(ActionEvent e){
                 selectedItem = categoryView.getSelectionModel().getSelectedItem();
-                try {
-                    DeleteCategory(selectedItem);
-                } catch (Exception exe) {
-                    
-                    exe.getLocalizedMessage();
-                } 
+               
+                deleteCategory(selectedItem);
             } 
         });
         contextMenu.getItems().addAll(addMenuItem, deleteMenuItem);
         
         return contextMenu;
     }
-    public static String selcectedItemMainCategory;
+    private void deleteCategory(TreeItem<String> categoryToDel) {
+        if (mainCategoryNames.contains(categoryToDel.getValue())) {
+            mainCategoryNames.remove(categoryToDel.getValue());
+        }
+        for (int i = 0; i < categoryToDel.getChildren().size(); i++) {
+            categoryToDel.getChildren().remove(categoryToDel.getChildren().get(i));
+        }
+        categoryToDel.getParent().getChildren().remove(categoryToDel);
+        
+        saveAndLoadCategoriesFromNewFile();
+    }
     
     public void SelectItem(MouseEvent e) throws IOException{
         
@@ -98,23 +83,8 @@ public class ChooseCategoryController implements Initializable{
             
             if (selectedItem != null && !parentsList.contains(selectedItem)) {
                 chosenCategory = selectedItem.getValue();
-                Stage stage = new Stage();
                 
-                switch (GetMainCategory(selectedItem)) {
-                    case "Technology":
-                    stage.setScene(CreateScene("TechnologyAddScene"));
-                    break;
-                    case "Food":
-                    stage.setScene(CreateScene("VegetablesAddScene"));
-                    break;
-                    case "Clothes":
-                    stage.setScene(CreateScene("ClothesScene"));
-                    break;
-                    default:
-                    stage.setScene(CreateScene("AddProduct"));
-                    selcectedItemMainCategory = GetMainCategory(selectedItem);
-                    break;
-                }
+                Stage stage = createAddNewProductStage();
                 
                 stage.initModality(Modality.APPLICATION_MODAL);
                 stage.showAndWait();  
@@ -125,13 +95,39 @@ public class ChooseCategoryController implements Initializable{
             categoryView.getSelectionModel().select(null);
         }
     }
-    Scene CreateScene(String fileName) throws IOException{
+    private Stage createAddNewProductStage(){
+        Stage stage = new Stage();
+
+        try {
+            stage.setScene(CreateScene(getNewSceneToCreate()));
+        } catch (IOException e) {
+            alert.setContentText("Could not find the file");
+            alert.show();
+        }
+        
+        return stage;
+    }
+    private String getNewSceneToCreate(){
+        switch (getMainCategoryOfSelectedProduct(selectedItem)) {
+            case "Technology":
+                return "TechnologyAddScene";
+            case "Food":
+                return "VegetablesAddScene";
+            case "Clothes":
+                return "ClothesScene";
+            default:
+                selcectedItemMainCategory = getMainCategoryOfSelectedProduct(selectedItem);
+                return "AddProduct";
+        }
+    }
+    private Scene CreateScene(String fileName) throws IOException{
         URL url = new File("Main/src/Scenes/AdminScenes/" + fileName + ".fxml").toURI().toURL();
         Parent root = FXMLLoader.load(url);
         Scene scene = new Scene(root);
+
         return scene;
     }
-    public void AddCategoryName(ActionEvent e) throws IOException, ClassNotFoundException{
+    public void AddCategoryName(ActionEvent e) {
         selectedItem = categoryView.getSelectionModel().getSelectedItem();
         TreeItem<String> newItem = new TreeItem<String>(categoryName.getText());
 
@@ -147,12 +143,10 @@ public class ChooseCategoryController implements Initializable{
         categoryName.setText("");
         addCategoryNameBttn.setVisible(false);
 
-        File f = new File("tree_structure.txt");
-        f.delete();
-        SaveCategories(categories, "root");
-        GetMainCategories();
+        saveAndLoadCategoriesFromNewFile();
+        getMainCategories();
     }
-    String GetMainCategory(TreeItem<String> item){
+    private String getMainCategoryOfSelectedProduct(TreeItem<String> item){
         String category = "";
         while(!item.getParent().getValue().equals("Categories")){
             category = item.getParent().getValue();
@@ -160,27 +154,77 @@ public class ChooseCategoryController implements Initializable{
         }
         return category;
     }
-    void SaveCategories(TreeItem<String> root, String parent) {
-        try(PrintWriter writer = new PrintWriter(new FileOutputStream(new File("tree_structure.txt"), true))){
-            writer.println(root.getValue() + "=" + parent);
+    
+    private FileOutputStream createFileAndOutputStream() throws FileNotFoundException{
+        
+        File saveFile = new File("tree_structure.txt");
+        FileOutputStream saveFileOutputStream = new FileOutputStream(saveFile, true);
+        
+        return saveFileOutputStream;
+    }
+    
+    private void getChildrenNodesAndToParent(HashMap<String,String> data){
+        if (data.size() > 0) {
+            List<TreeItem<String>> parents = getChildrenNodes(data, categories.getValue().toString());
+            categories.getChildren().addAll(parents);
+        }
+    }
+    private static void removeEndNodes(){
+        for (int i = 0; i < parentsList.size(); i++) {
+            if (parentsList.get(i).getChildren().isEmpty()) {
+                parentsList.remove(parentsList.get(i));
+                i--;
+            }
+        }
+    }
+    private static List<TreeItem<String>> getChildrenNodes(HashMap<String, String> hMap, String parent)
+    {
+        ArrayList<TreeItem<String>> children = new ArrayList<>();
+        TreeItem<String> newChild = new TreeItem<>();
 
+        for (Map.Entry<String, String> entry : hMap.entrySet()) {
+            if(entry.getValue().equals(parent)) {
+                newChild = new TreeItem<>(entry.getKey());
+                newChild.getChildren().addAll(getChildrenNodes(hMap, entry.getKey()));
+
+                parentsList.add(newChild);
+                children.add(newChild);
+            }
+        }
+        return children;
+    } 
+    private void saveAndLoadCategoriesFromNewFile(){
+        File f = new File("tree_structure.txt");
+        f.delete();
+    
+        saveCategories(categories, "root");
+    
+        loadCategories();
+        
+    }private void saveCategories(TreeItem<String> root, String parent) {
+        try{
+            
+            PrintWriter writer = new PrintWriter(createFileAndOutputStream());
+            writer.println(root.getValue() + "=" + parent);
+            
             for(TreeItem<String> child: root.getChildren()){
                 if(child.getChildren().isEmpty()){
                     writer.println(child.getValue() + "=" + root.getValue());
                 } else {
-                    SaveCategories(child, child.getParent().getValue());
+                    saveCategories(child, child.getParent().getValue());
                 }
             }
-        }
-        catch (FileNotFoundException ex) {
-            System.out.println(ex.getMessage());
+        } catch (FileNotFoundException e) {
+            alert.setContentText("Could not find the save file");
+            alert.show();
         }
     }
-    void LoadCategories() throws IOException, ClassNotFoundException{
+    private void loadCategories(){
         categories = new TreeItem<>("Categories");
         HashMap<String, String> data = new HashMap<>();
 
         File file = new File("tree_structure.txt");
+
         try(BufferedReader br = new BufferedReader(new FileReader(file)))
         {
             String st;
@@ -189,54 +233,18 @@ public class ChooseCategoryController implements Initializable{
                 data.put(splitLine[0], splitLine[1]);
             }
 
-            if (data.size() > 0) {
-                List<TreeItem<String>> parentItems = GetChildrenNodes(data, categories.getValue().toString());
-                categories.getChildren().addAll(parentItems);
-            }
-            RemoveEndNodes();
-            GetMainCategories();
-        } catch (IOException ex) {
-            System.out.println(ex.getMessage());
-        }
-    }
-    private static List<TreeItem<String>> GetChildrenNodes(HashMap<String, String> hMap, String parent)
-    {
-        ArrayList<TreeItem<String>> children = new ArrayList<>();
-        TreeItem<String> newChild = new TreeItem<>();
-        for (Map.Entry<String, String> entry : hMap.entrySet()) {
-            if(entry.getValue().equals(parent)) {
-                newChild = new TreeItem<>(entry.getKey());
-                newChild.getChildren().addAll(GetChildrenNodes(hMap, entry.getKey()));
-                parentsList.add(newChild);
-                children.add(newChild);
-            }
-        }
-        return children;
-    }
-    static void RemoveEndNodes(){
-        for (int i = 0; i < parentsList.size(); i++) {
-            if (parentsList.get(i).getChildren().isEmpty()) {
-                parentsList.remove(parentsList.get(i));
-                i--;
-            }
-        }
-    }
-    void DeleteCategory(TreeItem<String> categoryToDel) throws ClassNotFoundException, IOException{
-        if (mainCategoryNames.contains(categoryToDel.getValue())) {
-            mainCategoryNames.remove(categoryToDel.getValue());
-        }
-        for (int i = 0; i < categoryToDel.getChildren().size(); i++) {
-            categoryToDel.getChildren().remove(categoryToDel.getChildren().get(i));
-        }
-        categoryToDel.getParent().getChildren().remove(categoryToDel);
+            getChildrenNodesAndToParent(data);
 
-        File f = new File("tree_structure.txt");
-        f.delete();
-        SaveCategories(categories, "root");
-        LoadCategories();
+            removeEndNodes();
+            getMainCategories();
+        } catch (IOException ex) {
+            alert.setContentText("Could not load save");
+            alert.show();
+        }
     }
-    public void GetMainCategories(){
+    private void getMainCategories(){
         mainCategoryNames.clear();
+
         for (TreeItem<String> name : categories.getChildren()) {
             if (name.getParent().getValue().equals("Categories")) {
                 mainCategoryNames.add(name.getValue());

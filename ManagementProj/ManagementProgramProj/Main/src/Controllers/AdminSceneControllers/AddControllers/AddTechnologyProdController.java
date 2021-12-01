@@ -1,7 +1,6 @@
 package Controllers.AdminSceneControllers.AddControllers;
 
-import java.sql.SQLException;
-
+import Models.ProductModel;
 import Models.TechnologyProductModel;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -17,26 +16,30 @@ public class AddTechnologyProdController extends AddProductController{
     CheckBox usedCheckBox;
     
     @Override
-    public void AddProduct(ActionEvent e) throws SQLException {
-        if(SetName() && SetQuantity() && SetPrice() && SetResolution()){
-            TechnologyProductModel pModel = new TechnologyProductModel(GetLastIndex(), 
+    public void AddProduct(ActionEvent e){
+        if(areAllInputsValid()){
+            ProductModel newProduct = createNewProductModel();
+            addProductToDB(newProduct);
+            
+            stage = (Stage)((Node)e.getSource()).getScene().getWindow();
+            stage.close();
+        }
+    }        
+    @Override
+    protected Boolean areAllInputsValid() {
+        return super.areAllInputsValid() && isResolutionTextValid(resolutionText);
+    }
+    @Override
+    protected ProductModel createNewProductModel(){
+        setVariablesValues();
+        TechnologyProductModel pModel = new TechnologyProductModel(getIndexToAddNewProduct(), 
                                                                         nameText.getText(), 
                                                                         category, 
                                                                         quantity, 
                                                                         price, 
                                                                         resolutionText.getText(), 
                                                                         usedCheckBox.isSelected());
-            AddProductToDB(pModel);
-            stage = (Stage)((Node)e.getSource()).getScene().getWindow();
-            stage.close();
-        }
-    }        
-    Boolean SetResolution(){
-        if (resolutionText.getText().isEmpty()) {
-            alert.setContentText("Resolution: Enter a resolution");
-            alert.show();
-            return false;
-        }
-        return true;
+
+        return pModel;
     }
 }

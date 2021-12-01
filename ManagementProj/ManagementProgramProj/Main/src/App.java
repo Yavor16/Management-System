@@ -1,15 +1,14 @@
-import Controllers.DBConnection;
-import Controllers.SaveAndLoadHistory;
-import javafx.application.Application;
-import javafx.application.Platform;
+import java.io.IOException;
+
+import javafx.application.*;
+import javafx.scene.*;
+import javafx.stage.*;
+import Controllers.*;
+
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
-import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 
 public class App extends Application {
     
@@ -17,9 +16,9 @@ public class App extends Application {
         launch(args);
     }
     @Override
-    public void start(Stage stage) throws Exception{
+    public void start(Stage stage){
         DBConnection.Connect();
-        DBConnection.GetProducts();
+        DBConnection.getProducts();
 
         stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
             @Override
@@ -28,13 +27,16 @@ public class App extends Application {
                 Platform.exit();
             }
         });
+        openFirstScene(stage);
+    }
+    private void openFirstScene(Stage stage){
         try{
             Parent root = FXMLLoader.load(getClass().getResource("./Scenes/OpenScene.fxml"));
             Scene scene = new Scene(root);
             stage.setTitle("Management System");
             stage.setScene(scene);
             stage.show();
-        } catch(Exception e){
+        } catch(IOException e){
             Alert alert = new Alert(AlertType.ERROR);
             alert.setTitle("Error");
             alert.setContentText(e.getMessage());

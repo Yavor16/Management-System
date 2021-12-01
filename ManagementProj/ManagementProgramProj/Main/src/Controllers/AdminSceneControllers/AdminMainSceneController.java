@@ -1,37 +1,20 @@
 package Controllers.AdminSceneControllers;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.sql.SQLException;
-import java.util.Optional;
-import java.util.ResourceBundle;
+import javafx.scene.control.*;
+import javafx.collections.*;
+import javafx.scene.*;
+import javafx.stage.*;
+import javafx.fxml.*;
+import java.util.*;
+import java.net.*;
+import java.io.*;
+import Models.*;
 
-import Models.ClothesModel;
-import Models.ProductModel;
-import Models.TechnologyProductModel;
-import Models.VegetangleFruitModel;
 import Controllers.DBConnection;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ReadOnlyStringWrapper;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.fxml.Initializable;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
 import javafx.scene.control.Alert.AlertType;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
-import javafx.scene.Node;
 
 public class AdminMainSceneController implements Initializable{
 
@@ -40,12 +23,11 @@ public class AdminMainSceneController implements Initializable{
     private Parent root;
 
     public static ProductModel selectedProduct;
-    public static ObservableList<ProductModel> listOfProducts ;
+    public static ObservableList<ProductModel> products ;
+    public static String mainCat;
+    private static Alert alert = new Alert(AlertType.ERROR);
+    private URL url;
 
-    //FXML location URL
-    URL url;
-
-    /*****  FXML Attribs *****/
     @FXML
     Button openAddScenetBttn;
     @FXML 
@@ -66,161 +48,176 @@ public class AdminMainSceneController implements Initializable{
     Button closeWindowBttn;
     @FXML
     ComboBox<String> searchComboBox;
-    /************************************/
-
-    //ChooseCategoryController pInfoController;
 
     @Override 
     public void initialize(URL url, ResourceBundle rb ){
-        listOfProducts = FXCollections.observableArrayList();
+
+        products = FXCollections.observableArrayList();
         searchComboBox.setValue("All products");
         
-        try {
-            InitializeComboBox();
-            DBConnection.GetProducts();
-            UpdateTableView();
-            AddDataToTableView();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        initializeComboBox();
+        updateTableView();
+        initializeTableColumns();
+        bindButtonsToTable();
+       
     }
-    public void OpenAddProductScene(ActionEvent e) throws IOException, SQLException, ClassNotFoundException{
-
-        stage = new Stage();
-        stage.setScene(CreateScene("ChooseCategoryScene"));
-        stage.initModality(Modality.APPLICATION_MODAL);
-        stage.showAndWait();
-        UpdateTableView();
-        InitializeComboBox();
-    }
-    void GetCategoryController() throws IOException{
-        URL  url = new File("Main/src/Scenes/AdminScenes/ChooseCategoryScene.fxml").toURI().toURL();
-        FXMLLoader loader = new FXMLLoader(url);
-        root = loader.load();
-        loader.getController();
-    }
-    public static String mainCat;
-    
-    public void OpenEditProductScene(ActionEvent e) throws IOException, SQLException{
-        selectedProduct = productsTableView.getSelectionModel().getSelectedItem(); 
-
-        stage = new Stage();
-        DBConnection.GetProducts();
-        DBConnection.GetSpecificProduct(selectedProduct.GetID());
-        mainCat = DBConnection.wantedProd.GetMainCategory(); 
-        
-        if (mainCat.equals("Technology")) {
-            TechnologyProductModel tm = (TechnologyProductModel)DBConnection.wantedProd; 
-            selectedProduct = tm;
-            stage.setScene(CreateScene("TechnologyEditScene"));
-        } else if (mainCat.equals("Food")) {
-            VegetangleFruitModel fm = (VegetangleFruitModel)DBConnection.wantedProd;
-            selectedProduct= fm;
-            stage.setScene(CreateScene("FoodEditScene"));
-        } else if(mainCat.equals("Clothes")){
-            ClothesModel cm = (ClothesModel)DBConnection.wantedProd;
-            selectedProduct = cm;
-            stage.setScene(CreateScene("ClothesEditScene"));
-        } else{
-            ProductModel pm = (ProductModel)DBConnection.wantedProd;
-            selectedProduct = pm;
-            stage.setScene(CreateScene("EditProductScene"));
-        }
-
-        stage.initModality(Modality.APPLICATION_MODAL);
-        stage.showAndWait();
-        
-        UpdateTableView();
-    }
-    public void DeleteProduct(ActionEvent e) throws SQLException{
-        selectedProduct = productsTableView.getSelectionModel().getSelectedItem();  
-
-        Alert confirmDiag = new Alert(AlertType.CONFIRMATION);
-        confirmDiag.setTitle("Delete");
-        confirmDiag.setHeaderText("Are you sure you want to delete " + selectedProduct.GetName());
-        
-        Optional<ButtonType> result = confirmDiag.showAndWait();
-
-        if (result.get() == ButtonType.OK) {   
-            DBConnection.DeleteProduct(selectedProduct.GetID());
-            listOfProducts.remove(listOfProducts.indexOf(selectedProduct));
-            UpdateTableView();
-        } else{
-            confirmDiag.close();
-        }
-    }
-    private void UpdateTableView() throws SQLException{
-        DBConnection.GetProducts();
+    private void updateTableView() {
+        refreshProducts();
         if (!searchComboBox.getSelectionModel().isEmpty()){
 
             if (searchComboBox.getValue().toString() == "All products" ){
-                productsTableView.setItems(listOfProducts);
+                productsTableView.setItems(products);
             } else{
-                productsTableView.setItems(GetComboBoxSearchResults());
+                productsTableView.setItems(getComboBoxSearchResults());
             }
             productsTableView.refresh();
         }
     }
-    Scene CreateScene(String fileName) throws IOException{
-        url = new File("Main/src/Scenes/AdminScenes/" + fileName + ".fxml").toURI().toURL();
-        root = FXMLLoader.load(url);
+    private static void refreshProducts() {
         
-        scene = new Scene(root);
-        return scene;
+        products = FXCollections.observableArrayList();
+        DBConnection.getProducts();
+        products.clear();
+        for(var prod : DBConnection.product.entrySet()){
+            products.add(prod.getValue());
+        }
     }
-    void InitializeComboBox() throws IOException, ClassNotFoundException{
-        GetCategoryController();
-        //searchComboBox.getItems().clear();
-        ObservableList<String> comboBoxItems = FXCollections.observableArrayList(ChooseCategoryController.mainCategoryNames);
-        comboBoxItems.add("All products");
-        searchComboBox.setItems(comboBoxItems);
-    }
+    private ObservableList<ProductModel> getComboBoxSearchResults() {
+        ObservableList<ProductModel> searchResults = FXCollections.observableArrayList();
+        
+        for (ProductModel prod : products){
+            String comboBoxSelectedItem = searchComboBox.getValue().toString();
 
-    public void SearchUsingComboBox(ActionEvent e) throws SQLException{
-        SetListOfProducts();
-        UpdateTableView();
-    }
-    public void CloseWindow(ActionEvent e) throws IOException{
-        url = new File("Main/src/Scenes/OpenScene.fxml").toURI().toURL();
-        
-        root = FXMLLoader.load(url);
-
-        stage = (Stage)((Node )e.getSource()).getScene().getWindow();
-        scene = new Scene(root);
-        stage.setScene(scene);
-        stage.show();
-    }
-    ObservableList<ProductModel> GetComboBoxSearchResults() throws SQLException{
-        ObservableList<ProductModel> searchResultList = FXCollections.observableArrayList();
-        
-        for (ProductModel prod : listOfProducts){
-            if(prod.GetMainCategory().equals(searchComboBox.getValue().toString()) ){
-                searchResultList.add(prod);
+            if(prod.GetMainCategory().equals(comboBoxSelectedItem) ){
+                searchResults.add(prod);
             }
         }
-        return searchResultList;
+        return searchResults;
     }
-    public static void SetListOfProducts() throws SQLException{
-        listOfProducts = FXCollections.observableArrayList();
-        DBConnection.GetProducts();
-        listOfProducts.clear();
-        for(var prod : DBConnection.product.entrySet()){
-            listOfProducts.add(prod.getValue());
+    private void initializeComboBox() {
+        getChooseCategoryController();
+
+        ObservableList<String> comboBoxItems = FXCollections.observableArrayList(ChooseCategoryController.mainCategoryNames);
+        comboBoxItems.add("All products");
+
+        searchComboBox.setItems(comboBoxItems);
+    }
+    private void getChooseCategoryController() {
+        try {
+            URL  url = new File("Main/src/Scenes/AdminScenes/ChooseCategoryScene.fxml").toURI().toURL();
+            FXMLLoader loader = new FXMLLoader(url);
+            root = loader.load();
+            loader.getController();
+        } catch (IOException e) {
+            alert.setContentText("Could not open the scene");
+            alert.show();
         }
     }
-    void AddDataToTableView() throws SQLException{
-        SetListOfProducts();
+    private void initializeTableColumns(){
 
         nameTableCol.setCellValueFactory(d->new ReadOnlyStringWrapper(d.getValue().GetName()));
         categoryTableCol.setCellValueFactory(d->new ReadOnlyStringWrapper(d.getValue().GetCategory()));
         quantityTableCol.setCellValueFactory(d->new ReadOnlyStringWrapper(String.valueOf(d.getValue().GetQuantity())));
         priceTableCol.setCellValueFactory(d-> new ReadOnlyStringWrapper(String.valueOf(d.getValue().GetPrice())));
         
-        productsTableView.setItems(listOfProducts);
-
-        //With this two lines we check if no rows are selected the button are goint to be disabled and when we select a row the activad 
+        productsTableView.setItems(products);
+    }
+    private void bindButtonsToTable(){
         editBttn.disableProperty().bind(Bindings.isEmpty(productsTableView.getSelectionModel().getSelectedItems()));
         deleteBttn.disableProperty().bind(Bindings.isEmpty(productsTableView.getSelectionModel().getSelectedItems()));
+    }
+    public void OpenAddProductScene(ActionEvent e) throws IOException{
+        
+        stage = new Stage();
+        stage.setScene(createScene("ChooseCategoryScene"));
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.showAndWait();
+
+        updateTableView();
+        
+        initializeComboBox();
+    }
+
+    public void OpenEditProductScene(ActionEvent e) {
+        selectedProduct = productsTableView.getSelectionModel().getSelectedItem(); 
+
+        DBConnection.getProducts();
+        DBConnection.getSpecificProduct(selectedProduct.GetID());
+
+        chooseAndCreateEditProductScene();
+    
+        updateTableView();
+
+    }
+    private void chooseAndCreateEditProductScene(){
+        stage = new Stage();
+        mainCat = DBConnection.wantedProd.GetMainCategory(); 
+   
+        if (mainCat.equals("Technology")) {
+            selectedProduct = (TechnologyProductModel)DBConnection.wantedProd; 
+            stage.setScene(createScene("TechnologyEditScene"));
+        } else if (mainCat.equals("Food")) {
+            selectedProduct = (VegetangleFruitModel)DBConnection.wantedProd;
+            stage.setScene(createScene("FoodEditScene"));
+        } else if(mainCat.equals("Clothes")){
+            selectedProduct = (ClothesModel)DBConnection.wantedProd;
+            stage.setScene(createScene("ClothesEditScene"));
+        } else{
+            selectedProduct = (ProductModel)DBConnection.wantedProd;
+            stage.setScene(createScene("EditProductScene"));
+        }
+    
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.showAndWait();
+    }
+    private Scene createScene(String fileName) {
+        try{
+            url = new File("Main/src/Scenes/AdminScenes/" + fileName + ".fxml").toURI().toURL();
+            root = FXMLLoader.load(url);
+            
+            scene = new Scene(root);
+        } catch (IOException e) {
+            alert.setContentText("Cannot open new the " + fileName + "scene");
+            alert.show();
+        }
+        return scene;
+    }
+    public void DeleteProduct(ActionEvent e) {
+        selectedProduct = productsTableView.getSelectionModel().getSelectedItem();  
+
+        alert.setAlertType(AlertType.CONFIRMATION);
+        alert.setTitle("Delete");
+        alert.setHeaderText("Are you sure you want to delete " + selectedProduct.GetName());
+        
+        Optional<ButtonType> result = alert.showAndWait();
+
+        if (result.get() == ButtonType.OK) {   
+            DBConnection.deleteProduct(selectedProduct.GetID());
+            products.remove(products.indexOf(selectedProduct));
+            updateTableView();
+        } else{
+            alert.close();
+        }
+    }
+    
+    public void SearchUsingComboBox(ActionEvent e) {
+        updateTableView();
+    }
+    public void CloseWindow(ActionEvent e) {
+
+        try {
+            url = new File("Main/src/Scenes/OpenScene.fxml").toURI().toURL();
+            root = FXMLLoader.load(url);
+        } catch (IOException exe) {
+            alert.setContentText("Cannot open the scene");
+            alert.show();
+            return;
+        } 
+    
+        stage = (Stage)((Node )e.getSource()).getScene().getWindow();
+        scene = new Scene(root);
+        stage.setScene(scene);
+        stage.show();
     }
 }
 

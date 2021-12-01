@@ -1,14 +1,13 @@
 package Controllers.AdminSceneControllers.EditControllers;
 
 import java.net.URL;
-import java.sql.SQLException;
 import java.util.ResourceBundle;
 
+import Models.ProductModel;
 import Models.TechnologyProductModel;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.stage.Stage;
 import javafx.scene.Node;
 
@@ -28,27 +27,29 @@ public class TechnolofyEditController extends EditProductController{
         usedCheckBox.setSelected(chosenProduct.GetUsed());
     }
     @Override
-    public void UpdateProduct(ActionEvent e) throws SQLException {
-        if(SetPrice() && SetQuantity() && SetResolitoin()){
-            TechnologyProductModel pModel = new TechnologyProductModel(chosenProduct.GetID(), 
+    public void UpdateProduct(ActionEvent e) {
+        setVariablesValues();
+        if(areAllInputsValid()){
+            ProductModel newModel = createNewModelForUpdate();
+            updateProductToDB(newModel);
+
+            Stage stage = (Stage)((Node)e.getSource()).getScene().getWindow();
+            stage.close();
+        }
+    }
+    @Override
+    protected java.lang.Boolean areAllInputsValid() {
+        return super.areAllInputsValid() && isResolutionTextValid(resolutionText);
+    }
+    @Override
+    protected ProductModel createNewModelForUpdate() {
+        TechnologyProductModel pModel = new TechnologyProductModel(chosenProduct.GetID(), 
                                                                         chosenProduct.GetName(), 
                                                                         chosenProduct.GetCategory(), 
                                                                         quantity, 
                                                                         price, 
                                                                         resolutionText.getText(), 
                                                                         usedCheckBox.isSelected());
-            UpdateProductToDB(pModel);
-            Stage stage = (Stage)((Node)e.getSource()).getScene().getWindow();
-            stage.close();
-        }
-    }
-    Boolean SetResolitoin(){
-        if (resolutionText.getText().isEmpty()) {
-            alert.setTitle("Error");
-            alert.setContentText("Resolution: Enter a resolution");
-            alert.show();
-            return false;
-        }
-        return true;
+        return pModel;
     }
 }

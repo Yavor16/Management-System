@@ -1,21 +1,16 @@
 package Controllers.UserSceneControllers;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.net.URL;
 import java.util.ResourceBundle;
 
 import Models.ProductModel;
 import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.fxml.Initializable;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
+import javafx.fxml.*;
+import javafx.scene.*;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import javafx.scene.Node;
 
 public class BasketController implements Initializable{
     @FXML
@@ -29,7 +24,7 @@ public class BasketController implements Initializable{
             }
         }
     }
-    void AddProdToBasket(int amount, ProductModel prod){
+    private void AddProdToBasket(int amount, ProductModel prod){
         TextField text = new TextField();
         text.setText(prod.GetName() +" "+ amount +"x" + prod.GetPrice());
         text.setEditable(false);

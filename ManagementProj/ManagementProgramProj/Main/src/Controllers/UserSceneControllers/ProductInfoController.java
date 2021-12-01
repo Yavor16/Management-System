@@ -1,18 +1,14 @@
 package Controllers.UserSceneControllers;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
+import javafx.scene.control.*;
+import javafx.scene.image.*;
+import java.net.*;
+import java.io.*;
 
 import Models.ProductModel;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
+import javafx.scene.control.Alert.AlertType;
 
 public class ProductInfoController {
     @FXML
@@ -30,11 +26,11 @@ public class ProductInfoController {
     @FXML
     Label amountText;
 
-    int count = 0;
-    ProductModel productModel;
+    private int count = 0;
+    private ProductModel productModel;
 
     public void RemoveOneNum(ActionEvent e){
-        count = count == 0? count: count -1;
+        count = count == 0 ? count : count -1;
         if (count == 0) {
                 MainScene.basketItems.remove(productModel);            
         } else if (count > 0){
@@ -46,33 +42,40 @@ public class ProductInfoController {
         if (productModel.GetQuantity() > count) {
             count++;
             MainScene.basketItems.put(productModel, count);
-            System.out.println(MainScene.basketItems);
         }
         countText.setText(String.valueOf(count));
     }
-    void SetData(ProductModel prod) throws MalformedURLException{
+    public void setData(ProductModel prod) {
         productModel = prod;
         
-        nameText.setText(prod.GetName());
-
-        priceText.setText("Price: " + String.valueOf(prod.GetPrice()));
-
-        amountText.setText("Amount: " + String.valueOf(prod.GetQuantity()));
-
-        countText.setEditable(false);
-
-        if (prod.GetMainCategory().equals("Technology")) {
-            URL url = new File("Main/images/categoryicons/technology.png").toURI().toURL();
-            Image icon = new Image(url.toString());
-            productImage.setImage(icon);            
+        initializeTextFields(prod);
+        
+        if (prod.GetMainCategory().equals("Technology")) {  
+            setProductImageToImageView("technology");
         } else if (prod.GetMainCategory().equals("Food")) {
-            URL url = new File("Main/images/categoryicons/food.png").toURI().toURL();
-            Image icon = new Image(url.toString());
-            productImage.setImage(icon);
+            setProductImageToImageView("food");
         } else if (prod.GetMainCategory().equals("Clothes")) {
-            URL url = new File("Main/images/categoryicons/clothes.png").toURI().toURL();
+            setProductImageToImageView("clothes");
+        }
+    }
+    private void initializeTextFields(ProductModel prod){
+        nameText.setText(prod.GetName());
+            
+        priceText.setText("Price: " + String.valueOf(prod.GetPrice()));
+        
+        amountText.setText("Amount: " + String.valueOf(prod.GetQuantity()));
+        
+        countText.setEditable(false);
+    }
+    private void setProductImageToImageView(String imageName){
+        try {
+            URL url = new File("Main/images/categoryicons/"+ imageName +".png").toURI().toURL();
             Image icon = new Image(url.toString());
             productImage.setImage(icon);
+        } catch (MalformedURLException e) {
+            Alert alert = new Alert(AlertType.ERROR);
+            alert.setContentText("Could not create items");
+            alert.show();
         }
     }
 }

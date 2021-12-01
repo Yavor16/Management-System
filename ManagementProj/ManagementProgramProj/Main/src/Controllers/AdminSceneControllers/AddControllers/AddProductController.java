@@ -5,18 +5,16 @@ import java.sql.SQLException;
 import java.util.ResourceBundle;
 
 import Controllers.DBConnection;
-import Controllers.AdminSceneControllers.AdminMainSceneController;
-import Controllers.AdminSceneControllers.ChooseCategoryController;
+import Controllers.AdminSceneControllers.*;
 import Models.ProductModel;
 import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
+import javafx.fxml.*;
 import javafx.scene.control.Alert;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Stage;
 import javafx.scene.Node;
-public class AddProductController implements Initializable{
+public class AddProductController extends TextFieldsChecks implements Initializable{
 
     @FXML
     TextField nameText;
@@ -25,11 +23,11 @@ public class AddProductController implements Initializable{
     @FXML
     TextField priceText;
     
-    String category;
-    Stage stage;
-    float price;
-    int quantity;
-    static Alert alert = new Alert(AlertType.INFORMATION);
+    protected String category;
+    protected Stage stage;
+    protected float price;
+    protected int quantity;
+    protected static Alert alert = new Alert(AlertType.INFORMATION);
     
     @Override
     public void initialize(URL url, ResourceBundle rb){
@@ -38,109 +36,83 @@ public class AddProductController implements Initializable{
         alert.setHeaderText(""); 
     }
     public void AddProduct(ActionEvent e)throws SQLException {
-        if(SetName() && SetQuantity() && SetPrice()){
-            ProductModel pModel = new ProductModel(GetLastIndex(), 
-                                                    nameText.getText(), 
-                                                    category, 
-                                                    quantity, 
-                                                    price);
-            pModel.SetMainCategory(ChooseCategoryController.selcectedItemMainCategory);
-            AddProductToDB(pModel);
+        if(areAllInputsValid()){
+            ProductModel newModel = createNewProductModel();
+            addProductToDB(newModel);
+
             stage = (Stage)((Node)e.getSource()).getScene().getWindow();
             stage.close();
         }
     }
+    @Override
+    protected Boolean areAllInputsValid() {
+        return isNameTextValid(nameText) && isQuantityTextValid(quantityText) && isPriceTextValid(priceText);
+    }
+    protected ProductModel createNewProductModel(){
+        setVariablesValues();
+        ProductModel pModel = new ProductModel(getIndexToAddNewProduct(), 
+                                                nameText.getText(), 
+                                                category, 
+                                                quantity, 
+                                                price);
+        pModel.SetMainCategory(ChooseCategoryController.selcectedItemMainCategory);
+        return pModel;
+    }
+    
+    protected void setVariablesValues(){
+        price = Float.parseFloat(priceText.getText());
+        quantity = Integer.parseInt(quantityText.getText());
+    }
+    protected Integer getIndexToAddNewProduct(){   
+        DBConnection.getProducts();
 
-    void AddProductToDB(ProductModel pModel){
-        try{
-            DBConnection.GetProducts();
-            if (DoesListContainProduct(nameText.getText())) {
-                alert.setContentText("Change the name because this name already exists");
-                alert.show();
-            } else{   
-                DBConnection.AddProduct(pModel);
-                AdminMainSceneController.listOfProducts.add(new ProductModel(GetLastIndex() - 1, nameText.getText(), ChooseCategoryController.chosenCategory, quantity, price));
-                alert.setTitle("New product");
-                alert.setHeaderText("");
-                alert.setContentText("Product added!");
-                alert.show();
-            }
-            
-        } catch(Exception exe){
-            alert.setContentText(exe.getLocalizedMessage());
-            alert.show();
-        }
-    }
-    public void CancelProduct(ActionEvent e){
-        stage = (Stage)((Node)e.getSource()).getScene().getWindow();
-        stage.close();
-    }
-    Boolean DoesListContainProduct(String name){
-        int arrSize = AdminMainSceneController.listOfProducts.size();
-        for (int i = 0; i < arrSize; i++) {
-            if (AdminMainSceneController.listOfProducts.get(i).GetName().equals(name)) {
-                return true;
-            }
-        }
-        return false;
-    }
-    Boolean SetQuantity(){
-        if(!quantityText.getText().isEmpty()){
-
-            if(quantityText.getText().matches("[0-9]+")){
-                try{
-                    quantity = Integer.parseInt(quantityText.getText());
-                    return true;
-                }catch(Exception e){
-                    alert.setContentText("Enter smaller quantity!");
-                    alert.show();
-                    return false;
-                }
-            } else{
-                alert.setContentText("Quantity: Enter only numbers");
-                alert.show();
-                return false;
-            }
-        } else{
-            alert.setContentText("Quantity: Field cannot be empty!");
-            alert.show();
-            return false;
-        }
-    }
-    Boolean SetPrice(){
-        if(!priceText.getText().isEmpty()){
-            try{
-                price = Float.parseFloat(priceText.getText());
-                price = Math.round(price);
-                return true;
-            } catch(Exception e){
-               
-                alert.setContentText("Price: Enter only numbers");
-                alert.show();
-                return false;
-            }
-        } else{
-            alert.setContentText("Price: Field cannot be empty!");
-            alert.show();
-            return false;
-        }
-    }
-    Boolean SetName(){
-        if (nameText.getText().isEmpty()) {
-            alert.setContentText("Name: Enter a name");
-            alert.show();
-            return false;
-        }
-        return true;
-    }
-    //Object key;
-    int GetLastIndex() throws SQLException{
-        DBConnection.GetProducts();
         int id = 0;
         if (!DBConnection.product.isEmpty()) {            
             Object key = DBConnection.product.keySet().toArray()[DBConnection.product.size() - 1]; 
             id = DBConnection.product.get(key).GetID() + 1;
         }
         return id;
+    }
+    protected void addProductToDB(ProductModel pModel){
+    
+        DBConnection.getProducts();
+
+        if (isNewTheProductInList(nameText.getText())) {
+            alert.setContentText("Change the name because this name already exists");
+            alert.show();
+        } else{   
+            DBConnection.addProduct(pModel);
+
+            ProductModel newModel = new ProductModel(getIndexToAddNewProduct() - 1, 
+                                                        nameText.getText(), 
+                                                        ChooseCategoryController.chosenCategory, 
+                                                        quantity, 
+                                                        price);
+
+            AdminMainSceneController.products.add(newModel);
+
+            alert.setTitle("New product");
+            alert.setHeaderText("");
+            alert.setContentText("Product added!");
+            alert.show();
+        }          
+    }
+    
+    protected Boolean isNewTheProductInList(String searchedName){
+        int arrSize = AdminMainSceneController.products.size();
+        for (int i = 0; i < arrSize; i++) {
+
+            ProductModel currentProduct = AdminMainSceneController.products.get(i) ; 
+
+            if (currentProduct.GetName().equals(searchedName)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    public void CancelProduct(ActionEvent e){
+        stage = (Stage)((Node)e.getSource()).getScene().getWindow();
+        stage.close();
     }
 }

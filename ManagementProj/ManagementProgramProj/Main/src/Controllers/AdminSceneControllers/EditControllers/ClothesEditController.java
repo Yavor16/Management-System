@@ -1,10 +1,10 @@
 package Controllers.AdminSceneControllers.EditControllers;
 
 import java.net.URL;
-import java.sql.SQLException;
 import java.util.ResourceBundle;
 
 import Models.ClothesModel;
+import Models.ProductModel;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
@@ -23,25 +23,29 @@ public class ClothesEditController extends EditProductController{
         sizeText.setText(chosenProduct.GetSize());
     }
     @Override
-    public void UpdateProduct(ActionEvent e) throws SQLException {
-        if(SetPrice() && SetQuantity() && SetSize()){
-            ClothesModel pModel = new ClothesModel(chosenProduct.GetID(), 
-                                                                        chosenProduct.GetName(), 
-                                                                        chosenProduct.GetCategory(), 
-                                                                        quantity, 
-                                                                        price, 
-                                                                        sizeText.getText());
-            UpdateProductToDB(pModel);
+    public void UpdateProduct(ActionEvent e) {
+        if(areAllInputsValid()){
+
+            ProductModel newModel = createNewModelForUpdate();
+            updateProductToDB(newModel);
+
             Stage stage = (Stage)((Node)e.getSource()).getScene().getWindow();
             stage.close();
         }
         
     }
-    Boolean SetSize(){
-        if (sizeText.getText().isEmpty()) {
-            alert.setContentText("Size: Enter a size");
-            alert.show();            
-        }
-        return true;
+    @Override
+    protected java.lang.Boolean areAllInputsValid() {
+        return super.areAllInputsValid() && isSizeTextValid(sizeText);
+    }
+    @Override
+    protected ProductModel createNewModelForUpdate() {
+        ClothesModel pModel = new ClothesModel(chosenProduct.GetID(), 
+                                                chosenProduct.GetName(), 
+                                                chosenProduct.GetCategory(), 
+                                                quantity, 
+                                                price, 
+                                                sizeText.getText());
+        return pModel;
     }
 }

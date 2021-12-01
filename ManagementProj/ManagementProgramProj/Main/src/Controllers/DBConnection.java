@@ -1,28 +1,20 @@
 package Controllers;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.Properties;
-import java.util.TreeMap;
+import java.util.*;
+import java.sql.*;
+import Models.*;
 
-import Models.ClothesModel;
-import Models.ProductModel;
-import Models.TechnologyProductModel;
-import Models.VegetangleFruitModel;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 
 public class DBConnection {
     
-    static Connection dbConnection = null;
-    static PreparedStatement pst;
+    private static Connection dbConnection = null;
+    private static PreparedStatement pst;
+    private static Alert alert = new Alert(AlertType.WARNING);
     
+    public static ProductModel wantedProd;
     public static TreeMap<Integer, ProductModel> product = new TreeMap<Integer, ProductModel>();
-
-    static Alert alert = new Alert(AlertType.WARNING);
 
     public static void Connect(){
         try {
@@ -34,101 +26,137 @@ public class DBConnection {
             dbConnection = DriverManager.getConnection(url, info);
         } 
         catch (SQLException ex) {
-                alert.setTitle("Error");;
-                alert.setContentText("An error occurred while connecting MySQL database");
-                alert.showAndWait();
+            alert.setTitle("Error");;
+            alert.setContentText("An error occurred while connecting MySQL database");
+            alert.showAndWait();
         }
     }
-    public static void GetProducts() throws SQLException{
-
-        final String SQL = "SELECT * from product";
-        final ResultSet rs = dbConnection.createStatement().executeQuery(SQL);
+    public static void getProducts() {
+        try {
+            
+            final String SQL = "SELECT * from product";
+            final ResultSet rs = dbConnection.createStatement().executeQuery(SQL);
+            ProductModel currentProduct;
+            product.clear();
+            
+            while (rs.next()) {
+                currentProduct = chooseWhichProdModelToCreate(rs);
+                product.put(currentProduct.GetID(), currentProduct); 
+            }
+        } catch (SQLException e) {
+            alert.setContentText("Could get products from the database");
+            alert.show();
+        }
+    }
+    private static ProductModel chooseWhichProdModelToCreate(ResultSet rs){
         ProductModel currentProduct;
-        product.clear();
-
-        while (rs.next()) {
+        try {
             if(rs.getString("maincategory").equals("Technology")){
-                currentProduct = new TechnologyProductModel(rs.getInt("id"), 
-                                                            rs.getString("name"), 
-                                                            rs.getString("category"), 
-                                                            rs.getInt("quantity"), 
-                                                            rs.getFloat("price"), 
-                                                            rs.getString("resolution"), 
-                                                            rs.getBoolean("used"));
+                currentProduct = createTechnologyProductModel(rs);
             } else if (rs.getString("maincategory").equals("Food")) {
-                currentProduct = new VegetangleFruitModel(rs.getInt("id"), 
-                                                        rs.getString("name"), 
-                                                        rs.getString("category"), 
-                                                        rs.getInt("quantity"), 
-                                                        rs.getFloat("price"));
+                currentProduct = createFoodProductModel(rs);
             } else if (rs.getString("maincategory").equals("Clothes")){
-                currentProduct = new ClothesModel(rs.getInt("id"), 
+                currentProduct = createClothesProductModel(rs);
+            } else{
+                currentProduct = createProductModel(rs);
+            }
+            return currentProduct;
+        } catch (SQLException e) {
+            alert.setContentText("Cannot get product");
+            alert.show();
+            return null;
+        }
+    }
+    private static ProductModel createClothesProductModel(ResultSet rs) throws SQLException{
+        ProductModel currentProduct= new ClothesModel(rs.getInt("id"), 
                                                     rs.getString("name"), 
                                                     rs.getString("category"), 
                                                     rs.getInt("quantity"), 
                                                     rs.getFloat("price"), 
                                                     rs.getString("size"));
-            } else{
-                currentProduct = new ProductModel(rs.getInt("id"), 
-                                                        rs.getString("name"), 
-                                                        rs.getString("category"), 
-                                                        rs.getInt("quantity"), 
-                                                        rs.getFloat("price"));
-                currentProduct.SetMainCategory(rs.getString("maincategory"));
-            }
-            product.put(currentProduct.GetID(), currentProduct); 
+        return currentProduct;
+    }
+    private static ProductModel createFoodProductModel(ResultSet rs) throws SQLException{
+        ProductModel currentProduct  = new VegetangleFruitModel(rs.getInt("id"), 
+                                                                rs.getString("name"), 
+                                                                rs.getString("category"), 
+                                                                rs.getInt("quantity"), 
+                                                                rs.getFloat("price"));
+        return currentProduct;
+    }
+    private static ProductModel createTechnologyProductModel(ResultSet rs) throws SQLException{
+        ProductModel currentProduct = new TechnologyProductModel(rs.getInt("id"), 
+                                                                rs.getString("name"), 
+                                                                rs.getString("category"), 
+                                                                rs.getInt("quantity"), 
+                                                                rs.getFloat("price"), 
+                                                                rs.getString("resolution"), 
+                                                                rs.getBoolean("used"));
+        return currentProduct;
+    }
+    private static ProductModel createProductModel(ResultSet rs) throws SQLException{
+        ProductModel currentProduct = new ProductModel(rs.getInt("id"), 
+                                                    rs.getString("name"), 
+                                                    rs.getString("category"), 
+                                                    rs.getInt("quantity"), 
+                                                    rs.getFloat("price"));
+        currentProduct.SetMainCategory(rs.getString("maincategory"));
+        return currentProduct;
+    }
+    public static void addProduct(ProductModel pm) {
+        try {
+            
+            pst = dbConnection.prepareStatement("insert into product(id,name,category,price,quantity,resolution,used,size,maincategory)values(?,?,?,?,?,?,?,?,?)");
+            
+            setBasicVarValues(pm);
+            checkWhichProdToAdd(pm);
+            
+            pst.executeUpdate();
+        } catch (Exception e) {
+            alert.setContentText("Cannot add product to database");
+            alert.show();
         }
     }
-    
-    public static void AddProduct(ProductModel pm) throws SQLException{
-        
-        pst = dbConnection.prepareStatement("insert into product(id,name,category,price,quantity,resolution,used,size,maincategory)values(?,?,?,?,?,?,?,?,?)");
-        
+    private static void setBasicVarValues(ProductModel pm) throws SQLException{
         pst.setInt(1, pm.GetID());
         pst.setString(2, pm.GetName());
         pst.setString(3, pm.GetCategory());
         pst.setFloat(4, pm.GetPrice());
         pst.setInt(5, pm.GetQuantity());
-
+    }
+    private static void checkWhichProdToAdd(ProductModel pm) throws SQLException{
         if (pm instanceof TechnologyProductModel) {
             TechnologyProductModel tp = (TechnologyProductModel)pm;
             int isUsed = tp.GetUsed() ? 1 : 0;
-            pst.setString(6, tp.GetResolution());
-            pst.setInt(7, isUsed);
-            pst.setString(8, null);
-            pst.setString(9, tp.GetMainCategory());    
+            String used = String.valueOf(isUsed);  
+
+            setProductToAddVarValues(tp.GetResolution(), used, null, tp.GetMainCategory());
         } else if(pm instanceof VegetangleFruitModel){
-            pst.setString(6, null);
-            pst.setString(7, null);
-            pst.setString(8, null);
-            pst.setString(9, "Food");
+            setProductToAddVarValues(null, null, null, "Food");
         } else if(pm instanceof ClothesModel){
             ClothesModel cm = (ClothesModel)pm;
-            pst.setString(6, null);
-            pst.setString(7, null);
-            pst.setString(8, cm.GetSize());
-            pst.setString(9, cm.GetMainCategory());
+            setProductToAddVarValues(null, null, cm.GetSize(), cm.GetMainCategory());
         } else{
-            pst.setString(6, null);
-            pst.setString(7, null);
-            pst.setString(8, null);
-            pst.setString(9, pm.GetMainCategory());
+            setProductToAddVarValues(null, null, null, pm.GetMainCategory());
         }
-        pst.executeUpdate();
     }
-    public static void DeleteProduct(int id) throws SQLException{
-        
+    private static void setProductToAddVarValues(String resolution, String used, String size, String maincategory) throws SQLException{        
+        pst.setString(6, resolution);
+        pst.setString(7, used);
+        pst.setString(8, size);
+        pst.setString(9, maincategory);
+    }
+    public static void deleteProduct(int id) {
         try{
             pst = dbConnection.prepareStatement("delete from product where id= ?");
             pst.setInt(1, id);
             pst.executeUpdate();
-        } catch(Exception exe){
-            alert.setTitle("Error");;
-            alert.setContentText(exe.getLocalizedMessage());
-            alert.showAndWait();
+        } catch(SQLException exe){
+            alert.setContentText("Cannot delete product");
+            alert.show();
         }
     }
-    public static void UpdateProduct(ProductModel pm) throws SQLException{
+    public static void updateProduct(ProductModel pm) {
         
         try{
             pst = dbConnection.prepareStatement("update product set name= ?, price= ?, category= ?, quantity= ?, resolution= ?, used= ?,size= ?, maincategory= ? where id= ?");
@@ -140,79 +168,62 @@ public class DBConnection {
             pst.setInt(9, pm.GetID());
             
 
-            if (pm instanceof TechnologyProductModel ) {
-                TechnologyProductModel tp = (TechnologyProductModel)pm;
-                int isUsed = tp.GetUsed() ? 1 : 0;
-                pst.setString(5, tp.GetResolution());
-                pst.setInt(6, isUsed);
-                pst.setString(7, null);
-                pst.setString(8, tp.GetMainCategory());    
-            } else if(pm instanceof VegetangleFruitModel ){
-                pst.setString(5, null);
-                pst.setString(6, null);
-                pst.setString(7, null);
-                pst.setString(8, pm.GetMainCategory());
-            } else if(pm instanceof ClothesModel ){
-                ClothesModel cm = (ClothesModel)pm;
-                pst.setString(5, null);
-                pst.setString(6, null);
-                pst.setString(7, cm.GetSize());
-                pst.setString(8, cm.GetMainCategory());
-            }
-            else{
-                pst.setString(5, null);
-                pst.setString(6, null);
-                pst.setString(7, null);
-                pst.setString(8, pm.GetMainCategory());      
-            }
+            checkWhichProdToUpdate(pm);
             pst.executeUpdate();
 
-        } catch(Exception exe){          
-            alert.setTitle("Error");;
-            alert.setContentText(exe.getLocalizedMessage());
+        } catch(SQLException exe){          
+            alert.setContentText("Could not update product");
             alert.showAndWait();
         }
     }
-    public static ProductModel wantedProd;
+    private static void checkWhichProdToUpdate(ProductModel pm) throws SQLException{
+        if (pm instanceof TechnologyProductModel) {
+            TechnologyProductModel tp = (TechnologyProductModel)pm;
+            int isUsed = tp.GetUsed() ? 1 : 0;
+            String used = String.valueOf(isUsed);  
 
-    public static void GetSpecificProduct(int id) throws SQLException{
-        System.out.println(id);
-        final String SQL = "SELECT * FROM product where id=" + id ;
-        final ResultSet rs = dbConnection.createStatement().executeQuery(SQL);
-        wantedProd = null;
-
-        while (rs.next()) {
-            String category = rs.getString(9); 
-            if (category.equals("Technology")) {
-                wantedProd = new TechnologyProductModel(rs.getInt("id"), 
-                                                        rs.getString("name"), 
-                                                        rs.getString("category"), 
-                                                        rs.getInt("quantity"), 
-                                                        rs.getFloat("price"),
-                                                        rs.getString("resolution"),
-                                                        rs.getBoolean("used")); 
-            } 
-            else if(category.equals("Food")){
-                wantedProd = new VegetangleFruitModel(rs.getInt("id"), 
-                                                        rs.getString("name"), 
-                                                        rs.getString("category"), 
-                                                        rs.getInt("quantity"), 
-                                                        rs.getFloat("price"));
-            } else if(category.equals("Clothes")){
-                wantedProd = new ClothesModel(rs.getInt("id"), 
-                                                rs.getString("name"), 
-                                                rs.getString("category"), 
-                                                rs.getInt("quantity"), 
-                                                rs.getFloat("price"), 
-                                                rs.getString("size"));
-            } else{
-                wantedProd = new ProductModel(rs.getInt("id"), 
-                                                rs.getString("name"), 
-                                                rs.getString("category"), 
-                                                rs.getInt("quantity"), 
-                                                rs.getFloat("price"));
-                wantedProd.SetMainCategory(category);
+            setProductToUpdateVarValues(tp.GetResolution(), used, null, tp.GetMainCategory());
+        } else if(pm instanceof VegetangleFruitModel){
+            setProductToUpdateVarValues(null, null, null, "Food");
+        } else if(pm instanceof ClothesModel){
+            ClothesModel cm = (ClothesModel)pm;
+            setProductToUpdateVarValues(null, null, cm.GetSize(), cm.GetMainCategory());
+        } else{
+            setProductToUpdateVarValues(null, null, null, pm.GetMainCategory());
+        }
+    }
+    private static void setProductToUpdateVarValues(String resolution, String used, String size, String maincategory) throws SQLException{        
+        pst.setString(5, resolution);
+        pst.setString(6, used);
+        pst.setString(7, size);
+        pst.setString(8, maincategory);
+    }
+    
+    public static void getSpecificProduct(int id) {
+        try {
+            
+            final String SQL = "SELECT * FROM product where id=" + id ;
+            final ResultSet rs = dbConnection.createStatement().executeQuery(SQL);
+            wantedProd = null;
+            
+            while (rs.next()) {
+                String category = rs.getString(9); 
+                if (category.equals("Technology")) {
+                    wantedProd = createTechnologyProductModel(rs);
+                    
+                } else if(category.equals("Food")){
+                    wantedProd = createFoodProductModel(rs);
+                    
+                } else if(category.equals("Clothes")){
+                    wantedProd = createClothesProductModel(rs);
+                    
+                } else{
+                    wantedProd = createProductModel(rs);
+                }
             }
+        } catch (SQLException e) {
+            alert.setContentText("Could not get the product");
+            alert.show();
         }
     }
 }

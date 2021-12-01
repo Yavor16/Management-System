@@ -6,9 +6,8 @@ public class ProductModel {
     private final String category;
     private int quantity;
     private float price;
-    String mainCategory;
+    protected String mainCategory;
     
-
     public ProductModel(int id, String name, String category, int quantity, float price) {
         this.id= id;
         this.name = name;
