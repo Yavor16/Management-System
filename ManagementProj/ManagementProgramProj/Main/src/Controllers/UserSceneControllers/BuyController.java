@@ -4,13 +4,16 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+import Controllers.DataBaseFunctions.ProductFunctionality.AllProducts;
+
+import static Controllers.DataBaseFunctions.ProductFunctionality.UpdateProductToDB.*;
+import static Controllers.DataBaseFunctions.ProductFunctionality.DeleteProductFromDB.*;
+import static Controllers.ManageBills.*;
 import javafx.scene.control.*;
 import javafx.collections.*;
 import javafx.fxml.*;
 import Models.*;
 
-import Controllers.DBConnection;
-import static Controllers.ManageBills.*;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.event.ActionEvent;
@@ -94,7 +97,7 @@ public class BuyController implements Initializable{
     }
     public void BuyProducts(ActionEvent e) {
       
-        DBConnection.getProducts();
+        AllProducts.getProducts();
         
         ItemToBuyModel currentProd;
         ProductModel productFromDataBase;
@@ -103,17 +106,17 @@ public class BuyController implements Initializable{
         
         for (int i = 0; i < listSize; i++) {   
             currentProd = productsToBuy.get(i);
-            productFromDataBase = DBConnection.product.get(currentProd.GetProduct().GetID());
+            productFromDataBase = AllProducts.products.get(currentProd.GetProduct().GetID());
             
             int newProductQuantity = productFromDataBase.GetQuantity() - currentProd.GetProduct().GetQuantity(); 
 
             if (newProductQuantity > 0) {    
                 int productId = currentProd.GetProduct().GetID();
 
-                DBConnection.product.get(productId).SetQuantity(newProductQuantity);
-                DBConnection.updateProduct(productFromDataBase);
+                AllProducts.products.get(productId).SetQuantity(newProductQuantity);
+                updateProductToDB(productFromDataBase);
             } else{
-                DBConnection.deleteProduct(currentProd.GetProduct().GetID());
+                deleteProductFromDB(currentProd.GetProduct().GetID());
             }
         }
         addNewBill(productsToBuy);

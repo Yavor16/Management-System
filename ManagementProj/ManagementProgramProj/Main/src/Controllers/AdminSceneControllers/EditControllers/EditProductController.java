@@ -3,13 +3,12 @@ package Controllers.AdminSceneControllers.EditControllers;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-import Controllers.DBConnection;
-import Controllers.AdminSceneControllers.AdminMainSceneController;
-import Controllers.AdminSceneControllers.TextFieldsChecks;
+import Controllers.AdminSceneControllers.*;
+import javafx.scene.control.*;
+import javafx.fxml.*;
+import static Controllers.DataBaseFunctions.ProductFunctionality.UpdateProductToDB.*;
 import Models.ProductModel;
 import javafx.event.ActionEvent;
-import javafx.fxml.*;
-import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.Node;
 import javafx.stage.Stage;
@@ -42,7 +41,7 @@ public class EditProductController extends TextFieldsChecks implements Initializ
         if(areAllInputsValid()){
             
             ProductModel newModel = createNewModelForUpdate();
-            updateProductToDB(newModel);
+            updateProduct(newModel);
             
             Stage stage = (Stage)((Node)e.getSource()).getScene().getWindow();
             stage.close();
@@ -59,9 +58,8 @@ public class EditProductController extends TextFieldsChecks implements Initializ
 
         return pModel;
     }
-    public void updateProductToDB(ProductModel pModel){    
-        DBConnection.updateProduct(pModel);
-        
+    public void updateProduct(ProductModel pModel){    
+        updateProductToDB(pModel);
         alert.setTitle("Update");
         alert.setContentText(selectedProd.GetName() + " updated!");
         alert.show();

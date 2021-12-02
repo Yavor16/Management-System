@@ -4,7 +4,8 @@ import javafx.application.*;
 import javafx.scene.*;
 import javafx.stage.*;
 import Controllers.*;
-
+import Controllers.DataBaseFunctions.DBConnection;
+import Controllers.DataBaseFunctions.ProductFunctionality.AllProducts;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Alert;
@@ -18,7 +19,9 @@ public class App extends Application {
     @Override
     public void start(Stage stage){
         DBConnection.Connect();
-        DBConnection.getProducts();
+        AllProducts.getProducts();
+
+
 
         stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
             @Override

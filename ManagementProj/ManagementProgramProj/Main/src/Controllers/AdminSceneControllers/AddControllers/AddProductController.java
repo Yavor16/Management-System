@@ -1,16 +1,16 @@
 package Controllers.AdminSceneControllers.AddControllers;
+import Controllers.AdminSceneControllers.*;
+import javafx.scene.control.*;
+import javafx.fxml.*;
 
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.ResourceBundle;
+import Controllers.DataBaseFunctions.ProductFunctionality.AllProducts;
 
-import Controllers.DBConnection;
-import Controllers.AdminSceneControllers.*;
+import static Controllers.DataBaseFunctions.ProductFunctionality.AddToDataBase.*;
 import Models.ProductModel;
 import javafx.event.ActionEvent;
-import javafx.fxml.*;
-import javafx.scene.control.Alert;
-import javafx.scene.control.TextField;
 import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Stage;
 import javafx.scene.Node;
@@ -64,25 +64,24 @@ public class AddProductController extends TextFieldsChecks implements Initializa
         quantity = Integer.parseInt(quantityText.getText());
     }
     protected Integer getIndexToAddNewProduct(){   
-        DBConnection.getProducts();
+        AllProducts.getProducts();
 
         int id = 0;
-        if (!DBConnection.product.isEmpty()) {            
-            Object key = DBConnection.product.keySet().toArray()[DBConnection.product.size() - 1]; 
-            id = DBConnection.product.get(key).GetID() + 1;
+        if (!AllProducts.products.isEmpty()) {            
+            Object key = AllProducts.products.keySet().toArray()[AllProducts.products.size() - 1]; 
+            id = AllProducts.products.get(key).GetID() + 1;
         }
         return id;
     }
     protected void addProductToDB(ProductModel pModel){
     
-        DBConnection.getProducts();
+        AllProducts.getProducts();
 
         if (isNewTheProductInList(nameText.getText())) {
             alert.setContentText("Change the name because this name already exists");
             alert.show();
         } else{   
-            DBConnection.addProduct(pModel);
-
+            addNewProductToDB(pModel);
             ProductModel newModel = new ProductModel(getIndexToAddNewProduct() - 1, 
                                                         nameText.getText(), 
                                                         ChooseCategoryController.chosenCategory, 

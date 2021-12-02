@@ -6,15 +6,18 @@ import javafx.scene.*;
 import javafx.stage.*;
 import javafx.fxml.*;
 import java.util.*;
+
+import Controllers.DataBaseFunctions.ProductFunctionality.AllProducts;
+import Controllers.DataBaseFunctions.ProductFunctionality.GetProduct;
+
 import java.net.*;
 import java.io.*;
 import Models.*;
-
-import Controllers.DBConnection;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Alert.AlertType;
+import static Controllers.DataBaseFunctions.ProductFunctionality.DeleteProductFromDB.*;
 
 public class AdminMainSceneController implements Initializable{
 
@@ -76,9 +79,9 @@ public class AdminMainSceneController implements Initializable{
     private static void refreshProducts() {
         
         products = FXCollections.observableArrayList();
-        DBConnection.getProducts();
+        AllProducts.getProducts();
         products.clear();
-        for(var prod : DBConnection.product.entrySet()){
+        for(var prod : AllProducts.products.entrySet()){
             products.add(prod.getValue());
         }
     }
@@ -109,7 +112,7 @@ public class AdminMainSceneController implements Initializable{
             root = loader.load();
             loader.getController();
         } catch (IOException e) {
-            alert.setContentText("Could not open the scene");
+            alert.setContentText("Could not open the ChooseCategoryScene scene");
             alert.show();
         }
     }
@@ -141,8 +144,8 @@ public class AdminMainSceneController implements Initializable{
     public void OpenEditProductScene(ActionEvent e) {
         selectedProduct = productsTableView.getSelectionModel().getSelectedItem(); 
 
-        DBConnection.getProducts();
-        DBConnection.getSpecificProduct(selectedProduct.GetID());
+        AllProducts.getProducts();
+        GetProduct.getSpecificProduct(selectedProduct.GetID());
 
         chooseAndCreateEditProductScene();
     
@@ -151,19 +154,19 @@ public class AdminMainSceneController implements Initializable{
     }
     private void chooseAndCreateEditProductScene(){
         stage = new Stage();
-        mainCat = DBConnection.wantedProd.GetMainCategory(); 
+        mainCat = GetProduct.wantedProd.GetMainCategory(); 
    
         if (mainCat.equals("Technology")) {
-            selectedProduct = (TechnologyProductModel)DBConnection.wantedProd; 
+            selectedProduct = (TechnologyProductModel)GetProduct.wantedProd; 
             stage.setScene(createScene("TechnologyEditScene"));
         } else if (mainCat.equals("Food")) {
-            selectedProduct = (VegetangleFruitModel)DBConnection.wantedProd;
+            selectedProduct = (VegetangleFruitModel)GetProduct.wantedProd;
             stage.setScene(createScene("FoodEditScene"));
         } else if(mainCat.equals("Clothes")){
-            selectedProduct = (ClothesModel)DBConnection.wantedProd;
+            selectedProduct = (ClothesModel)GetProduct.wantedProd;
             stage.setScene(createScene("ClothesEditScene"));
         } else{
-            selectedProduct = (ProductModel)DBConnection.wantedProd;
+            selectedProduct = (ProductModel)GetProduct.wantedProd;
             stage.setScene(createScene("EditProductScene"));
         }
     
@@ -192,7 +195,7 @@ public class AdminMainSceneController implements Initializable{
         Optional<ButtonType> result = alert.showAndWait();
 
         if (result.get() == ButtonType.OK) {   
-            DBConnection.deleteProduct(selectedProduct.GetID());
+            deleteProductFromDB(selectedProduct.GetID());
             products.remove(products.indexOf(selectedProduct));
             updateTableView();
         } else{

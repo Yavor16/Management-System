@@ -1,5 +1,7 @@
 Household=Categories
 as=Household
+Toys=Categories
+Robot=Toys
 Laptop=Technology
 Lenovo=Laptop
 Technology=Categories
@@ -11,5 +13,4 @@ Woman=Clothes
 Bra=Woman
 Clothes=Categories
 Categories=root
-Toys=Categories
 Food=Categories

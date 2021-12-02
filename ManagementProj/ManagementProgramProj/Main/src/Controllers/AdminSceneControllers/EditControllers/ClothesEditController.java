@@ -27,7 +27,7 @@ public class ClothesEditController extends EditProductController{
         if(areAllInputsValid()){
 
             ProductModel newModel = createNewModelForUpdate();
-            updateProductToDB(newModel);
+            updateProduct(newModel);
 
             Stage stage = (Stage)((Node)e.getSource()).getScene().getWindow();
             stage.close();

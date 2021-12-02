@@ -2,6 +2,8 @@ package Controllers.AdminSceneControllers;
 
 import java.net.URL;
 import java.util.*;
+
+
 import java.io.*;
 
 import javafx.scene.control.Alert.AlertType;
@@ -31,7 +33,7 @@ public class ChooseCategoryController implements Initializable{
     public void initialize(URL url, ResourceBundle rb ){
 
         loadCategories();
-
+        
         categoryView.setContextMenu(CreateContextMenu());
         categoryView.setRoot(categories);
         categories.setExpanded(true);
@@ -39,7 +41,7 @@ public class ChooseCategoryController implements Initializable{
         categoryName.setVisible(false);
         addCategoryNameBttn.setVisible(false);
     }
-    ContextMenu CreateContextMenu(){
+    private ContextMenu CreateContextMenu(){
         ContextMenu contextMenu = new ContextMenu();
         
         MenuItem addMenuItem = new MenuItem("Add Category");
@@ -144,6 +146,7 @@ public class ChooseCategoryController implements Initializable{
         addCategoryNameBttn.setVisible(false);
 
         saveAndLoadCategoriesFromNewFile();
+       
         getMainCategories();
     }
     private String getMainCategoryOfSelectedProduct(TreeItem<String> item){
@@ -153,21 +156,6 @@ public class ChooseCategoryController implements Initializable{
             item = item.getParent();
         }
         return category;
-    }
-    
-    private FileOutputStream createFileAndOutputStream() throws FileNotFoundException{
-        
-        File saveFile = new File("tree_structure.txt");
-        FileOutputStream saveFileOutputStream = new FileOutputStream(saveFile, true);
-        
-        return saveFileOutputStream;
-    }
-    
-    private void getChildrenNodesAndToParent(HashMap<String,String> data){
-        if (data.size() > 0) {
-            List<TreeItem<String>> parents = getChildrenNodes(data, categories.getValue().toString());
-            categories.getChildren().addAll(parents);
-        }
     }
     private static void removeEndNodes(){
         for (int i = 0; i < parentsList.size(); i++) {
@@ -198,13 +186,11 @@ public class ChooseCategoryController implements Initializable{
         f.delete();
     
         saveCategories(categories, "root");
-    
         loadCategories();
         
     }private void saveCategories(TreeItem<String> root, String parent) {
-        try{
+        try(PrintWriter writer = new PrintWriter(createFileAndOutputStream())){
             
-            PrintWriter writer = new PrintWriter(createFileAndOutputStream());
             writer.println(root.getValue() + "=" + parent);
             
             for(TreeItem<String> child: root.getChildren()){
@@ -217,7 +203,15 @@ public class ChooseCategoryController implements Initializable{
         } catch (FileNotFoundException e) {
             alert.setContentText("Could not find the save file");
             alert.show();
+            return;
         }
+    }
+    private FileOutputStream createFileAndOutputStream() throws FileNotFoundException{
+        
+        File saveFile = new File("tree_structure.txt");
+        FileOutputStream saveFileOutputStream = new FileOutputStream(saveFile, true);
+        
+        return saveFileOutputStream;
     }
     private void loadCategories(){
         categories = new TreeItem<>("Categories");
@@ -240,6 +234,12 @@ public class ChooseCategoryController implements Initializable{
         } catch (IOException ex) {
             alert.setContentText("Could not load save");
             alert.show();
+        }
+    }
+    private void getChildrenNodesAndToParent(HashMap<String,String> data){
+        if (data.size() > 0) {
+            List<TreeItem<String>> parents = getChildrenNodes(data, categories.getValue().toString());
+            categories.getChildren().addAll(parents);
         }
     }
     private void getMainCategories(){

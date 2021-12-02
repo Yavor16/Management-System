@@ -11,6 +11,7 @@ import javafx.collections.*;
 import javafx.scene.*;
 import javafx.stage.*;
 import Controllers.*;
+import Controllers.DataBaseFunctions.ProductFunctionality.AllProducts;
 import javafx.fxml.*;
 import java.util.*;
 import java.io.*;
@@ -68,9 +69,9 @@ public class MainScene implements Initializable{
         });
     }
     private void updateDataStructures(){
-        DBConnection.getProducts();
+        AllProducts.getProducts();
         
-        pm = FXCollections.observableArrayList(DBConnection.product.values());
+        pm = FXCollections.observableArrayList(AllProducts.products.values());
         filteredResultsFromSearch = new FilteredList<>(pm, b->true);
         sortedResultFromSearch = new SortedList<>(filteredResultsFromSearch);
     }
@@ -136,7 +137,7 @@ public class MainScene implements Initializable{
         }
     }
     private void updateTilePane() {
-        DBConnection.getProducts();
+        AllProducts.getProducts();
         productsGrid.getChildren().clear();
 
         int row = 0, col=0;
