@@ -1,7 +1,9 @@
 Household=Categories
 as=Household
-Toys=Categories
 Robot=Toys
+Bumblebee=Robot
+Toys=Categories
+James=Toys
 Laptop=Technology
 Lenovo=Laptop
 Technology=Categories

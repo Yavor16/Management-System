@@ -1,13 +1,9 @@
 package Controllers.DataBaseFunctions.ProductFunctionality;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
+import Models.*;
 
-import Controllers.DataBaseFunctions.DBConnection;
-import Models.ClothesModel;
-import Models.ProductModel;
-import Models.TechnologyProductModel;
-import Models.VegetangleFruitModel;
+import static Controllers.DataBaseFunctions.DBConnection.*;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 
@@ -16,9 +12,11 @@ public class UpdateProductToDB {
     private static Alert alert = new Alert(AlertType.WARNING);
     
     public static void updateProductToDB(ProductModel pm) {
-        
         try{
-            pst = DBConnection.dbConnection.prepareStatement("update product set name= ?, price= ?, category= ?, quantity= ?, resolution= ?, used= ?,size= ?, maincategory= ? where id= ?");
+            getDBConnection().connectToDataBase();
+
+            Connection dbConnection = getTheConnectionToTheDB(); 
+            pst = dbConnection.prepareStatement("update product set name= ?, price= ?, category= ?, quantity= ?, resolution= ?, used= ?,size= ?, maincategory= ? where id= ?");
             
             pst.setString(1, pm.GetName());
             pst.setFloat(2, pm.GetPrice());
@@ -33,6 +31,7 @@ public class UpdateProductToDB {
         } catch(SQLException exe){          
             alert.setContentText("Could not update product");
             alert.showAndWait();
+            return;
         }
     }
     private static void checkWhichProdToUpdate(ProductModel pm) throws SQLException{

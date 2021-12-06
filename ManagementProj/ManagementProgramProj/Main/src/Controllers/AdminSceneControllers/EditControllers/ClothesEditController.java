@@ -40,6 +40,7 @@ public class ClothesEditController extends EditProductController{
     }
     @Override
     protected ProductModel createNewModelForUpdate() {
+        setVariablesValues();
         ClothesModel pModel = new ClothesModel(chosenProduct.GetID(), 
                                                 chosenProduct.GetName(), 
                                                 chosenProduct.GetCategory(), 

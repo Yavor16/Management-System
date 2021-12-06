@@ -2,7 +2,7 @@ package Controllers.DataBaseFunctions.ProductFunctionality;
 
 import java.sql.*;
 
-import Controllers.DataBaseFunctions.DBConnection;
+import static Controllers.DataBaseFunctions.DBConnection.*;
 import Models.*;
 
 import javafx.scene.control.Alert;
@@ -15,8 +15,10 @@ public class AddToDataBase {
     
     public static void addNewProductToDB(ProductModel pm) {
         try {
-            
-            pst = DBConnection.dbConnection.prepareStatement("insert into product(id,name,category,price,quantity,resolution,used,size,maincategory)values(?,?,?,?,?,?,?,?,?)");
+            getDBConnection().connectToDataBase();
+            Connection dbConnection =getTheConnectionToTheDB();
+
+            pst = dbConnection.prepareStatement("insert into product(id,name,category,price,quantity,resolution,used,size,maincategory)values(?,?,?,?,?,?,?,?,?)");
             
             setBasicVarValues(pm);
             checkWhichProdToAdd(pm);

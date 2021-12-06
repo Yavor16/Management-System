@@ -3,7 +3,7 @@ package Controllers.DataBaseFunctions.ProductFunctionality;
 import java.sql.*;
 import java.util.TreeMap;
 
-import Controllers.DataBaseFunctions.DBConnection;
+import static Controllers.DataBaseFunctions.DBConnection.*;
 import Models.*;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -15,8 +15,8 @@ public class AllProducts extends CreateModels{
 
     public static void getProducts() {
         try {  
-            final String SQL = "SELECT * from product";
-            final ResultSet rs = DBConnection.dbConnection.createStatement().executeQuery(SQL);
+            final ResultSet rs = getResultsFromDataBase();
+            
             ProductModel currentProduct;
             products.clear();
             
@@ -28,6 +28,16 @@ public class AllProducts extends CreateModels{
             alert.setContentText("Could get products from the database");
             alert.show();
         }
+    }
+    private static ResultSet getResultsFromDataBase() throws SQLException{
+        getDBConnection().connectToDataBase();
+
+        final String SQL = "SELECT * from product";
+        
+        Connection dbConnection = getTheConnectionToTheDB(); 
+        final ResultSet rs = dbConnection.createStatement().executeQuery(SQL);
+    
+        return rs;
     }
     private static ProductModel chooseWhichProdModelToCreate(ResultSet rs){
         ProductModel currentProduct;

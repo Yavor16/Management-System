@@ -31,6 +31,8 @@ public class FoodEditController extends EditProductController{
     }
     @Override
     protected ProductModel createNewModelForUpdate() {
+        setVariablesValues();
+
         VegetangleFruitModel pModel = new VegetangleFruitModel(chosenProduct.GetID(), 
                                                                 chosenProduct.GetName(), 
                                                                 chosenProduct.GetCategory(), 
