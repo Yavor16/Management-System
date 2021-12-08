@@ -10,6 +10,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 
 public class App extends Application {
+
     public static void main(String[] args) {
         launch(args);
     }

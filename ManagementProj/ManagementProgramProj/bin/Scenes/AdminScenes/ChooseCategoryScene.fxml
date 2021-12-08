@@ -6,7 +6,7 @@
 <?import javafx.scene.control.TreeView?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="453.0" prefWidth="407.0" style="-fx-background-color: #333;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controllers.AdminSceneControllers.ChooseCategoryController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="453.0" prefWidth="407.0" style="-fx-background-color: #333;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controllers.AdminSceneControllers.Categories.ChooseCategoryController">
    <children>
       <TreeView fx:id="categoryView" cacheShape="false" layoutX="13.0" layoutY="29.0" onMouseClicked="#SelectItem" prefHeight="370.0" prefWidth="381.0" scaleShape="false" style="-fx-background-color: gray;" />
       <TextField fx:id="categoryName" layoutX="13.0" layoutY="410.0" promptText="Category Name" />

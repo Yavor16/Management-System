@@ -1,5 +1,7 @@
 package Controllers.AdminSceneControllers.AddControllers;
+
 import Controllers.AdminSceneControllers.*;
+import Controllers.AdminSceneControllers.Categories.ChooseCategoryController;
 import javafx.scene.control.*;
 import javafx.fxml.*;
 

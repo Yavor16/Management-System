@@ -3,12 +3,13 @@ package Controllers.DataBaseFunctions.ProductFunctionality;
 import java.sql.*;
 import java.util.TreeMap;
 
-import static Controllers.DataBaseFunctions.DBConnection.*;
+import Controllers.DataBaseFunctions.DBConnection;
+
 import Models.*;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 
-public class AllProducts extends CreateModels{
+public class AllProducts implements CreateModels{
 
     private static Alert alert = new Alert(AlertType.WARNING);
     public static TreeMap<Integer, ProductModel> products = new TreeMap<Integer, ProductModel>();
@@ -30,11 +31,11 @@ public class AllProducts extends CreateModels{
         }
     }
     private static ResultSet getResultsFromDataBase() throws SQLException{
-        getDBConnection().connectToDataBase();
+        DBConnection.getDBConnection().connectToDataBase();
 
         final String SQL = "SELECT * from product";
         
-        Connection dbConnection = getTheConnectionToTheDB(); 
+        Connection dbConnection = DBConnection.getTheConnectionToTheDB(); 
         final ResultSet rs = dbConnection.createStatement().executeQuery(SQL);
     
         return rs;
@@ -43,13 +44,13 @@ public class AllProducts extends CreateModels{
         ProductModel currentProduct;
         try {
             if(rs.getString("maincategory").equals("Technology")){
-                currentProduct = createTechnologyProductModel(rs);
+                currentProduct = CreateModels.createTechnologyProductModel(rs);
             } else if (rs.getString("maincategory").equals("Food")) {
-                currentProduct = createFoodProductModel(rs);
+                currentProduct = CreateModels.createFoodProductModel(rs);
             } else if (rs.getString("maincategory").equals("Clothes")){
-                currentProduct = createClothesProductModel(rs);
+                currentProduct = CreateModels.createClothesProductModel(rs);
             } else{
-                currentProduct = createProductModel(rs);
+                currentProduct = CreateModels.createProductModel(rs);
             }
             return currentProduct;
         } catch (SQLException e) {

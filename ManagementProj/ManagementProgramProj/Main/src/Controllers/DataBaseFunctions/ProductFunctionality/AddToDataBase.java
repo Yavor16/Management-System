@@ -2,7 +2,7 @@ package Controllers.DataBaseFunctions.ProductFunctionality;
 
 import java.sql.*;
 
-import static Controllers.DataBaseFunctions.DBConnection.*;
+import Controllers.DataBaseFunctions.DBConnection;
 import Models.*;
 
 import javafx.scene.control.Alert;
@@ -15,11 +15,7 @@ public class AddToDataBase {
     
     public static void addNewProductToDB(ProductModel pm) {
         try {
-            getDBConnection().connectToDataBase();
-            Connection dbConnection =getTheConnectionToTheDB();
-
-            pst = dbConnection.prepareStatement("insert into product(id,name,category,price,quantity,resolution,used,size,maincategory)values(?,?,?,?,?,?,?,?,?)");
-            
+            tryToConnectToDBAndPrepareStatement();
             setBasicVarValues(pm);
             checkWhichProdToAdd(pm);
             
@@ -28,6 +24,13 @@ public class AddToDataBase {
             alert.setContentText("Cannot add product to database");
             alert.show();
         }
+    }
+    private static void tryToConnectToDBAndPrepareStatement() throws SQLException{
+        DBConnection.getDBConnection().connectToDataBase();
+        Connection dbConnection = DBConnection.getTheConnectionToTheDB();
+
+        pst = dbConnection.prepareStatement("insert into product(id,name,category,price,quantity,resolution,used,size,maincategory)values(?,?,?,?,?,?,?,?,?)");
+    
     }
     private static void setBasicVarValues(ProductModel pm) throws SQLException{
         pst.setInt(1, pm.GetID());

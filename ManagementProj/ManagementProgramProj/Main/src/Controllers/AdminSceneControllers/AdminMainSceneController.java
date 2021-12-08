@@ -7,8 +7,9 @@ import javafx.stage.*;
 import javafx.fxml.*;
 import java.util.*;
 
-import Controllers.DataBaseFunctions.ProductFunctionality.AllProducts;
-import Controllers.DataBaseFunctions.ProductFunctionality.GetProduct;
+import static Controllers.DataBaseFunctions.ProductFunctionality.DeleteProductFromDB.*;
+import static Controllers.AdminSceneControllers.Categories.ChooseCategoryController.*;
+import Controllers.DataBaseFunctions.ProductFunctionality.*;
 
 import java.net.*;
 import java.io.*;
@@ -17,7 +18,6 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Alert.AlertType;
-import static Controllers.DataBaseFunctions.ProductFunctionality.DeleteProductFromDB.*;
 
 public class AdminMainSceneController implements Initializable{
 
@@ -98,23 +98,11 @@ public class AdminMainSceneController implements Initializable{
         return searchResults;
     }
     private void initializeComboBox() {
-        getChooseCategoryController();
 
-        ObservableList<String> comboBoxItems = FXCollections.observableArrayList(ChooseCategoryController.mainCategoryNames);
+        ObservableList<String> comboBoxItems = FXCollections.observableArrayList(mainCategoryNames);
         comboBoxItems.add("All products");
 
         searchComboBox.setItems(comboBoxItems);
-    }
-    private void getChooseCategoryController() {
-        try {
-            URL  url = new File("Main/src/Scenes/AdminScenes/ChooseCategoryScene.fxml").toURI().toURL();
-            FXMLLoader loader = new FXMLLoader(url);
-            root = loader.load();
-            loader.getController();
-        } catch (IOException e) {
-            alert.setContentText("Could not open the ChooseCategoryScene scene");
-            alert.show();
-        }
     }
     private void initializeTableColumns(){
 

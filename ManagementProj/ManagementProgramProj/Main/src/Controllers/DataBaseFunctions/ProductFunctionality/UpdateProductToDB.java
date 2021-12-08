@@ -1,9 +1,10 @@
 package Controllers.DataBaseFunctions.ProductFunctionality;
 
 import java.sql.*;
+
+import Controllers.DataBaseFunctions.DBConnection;
 import Models.*;
 
-import static Controllers.DataBaseFunctions.DBConnection.*;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 
@@ -13,10 +14,7 @@ public class UpdateProductToDB {
     
     public static void updateProductToDB(ProductModel pm) {
         try{
-            getDBConnection().connectToDataBase();
-
-            Connection dbConnection = getTheConnectionToTheDB(); 
-            pst = dbConnection.prepareStatement("update product set name= ?, price= ?, category= ?, quantity= ?, resolution= ?, used= ?,size= ?, maincategory= ? where id= ?");
+            tryToConnectToDBAndPrepareStatement();
             
             pst.setString(1, pm.GetName());
             pst.setFloat(2, pm.GetPrice());
@@ -33,6 +31,12 @@ public class UpdateProductToDB {
             alert.showAndWait();
             return;
         }
+    }
+    private static void tryToConnectToDBAndPrepareStatement() throws SQLException{
+        DBConnection.getDBConnection().connectToDataBase();
+        Connection dbConnection = DBConnection.getTheConnectionToTheDB();
+
+        pst = dbConnection.prepareStatement("update product set name= ?, price= ?, category= ?, quantity= ?, resolution= ?, used= ?,size= ?, maincategory= ? where id= ?");
     }
     private static void checkWhichProdToUpdate(ProductModel pm) throws SQLException{
         if (pm instanceof TechnologyProductModel) {

@@ -1,8 +1,10 @@
-package Controllers.AdminSceneControllers;
+package Controllers.AdminSceneControllers.Categories;
 
 import java.net.URL;
 import java.util.*;
 
+import Controllers.DataBaseFunctions.CategoryFunctions.ChildCategories.AllChildCategories;
+import Controllers.DataBaseFunctions.CategoryFunctions.ChildCategories.Category;
 
 import java.io.*;
 
@@ -14,7 +16,7 @@ import javafx.event.*;
 import javafx.stage.*;
 import javafx.fxml.*;
 
-public class ChooseCategoryController implements Initializable{
+public class ChooseCategoryController extends LoadCategories implements Initializable, AddCategories{
     @FXML
     TreeView<String> categoryView;
     @FXML
@@ -22,9 +24,7 @@ public class ChooseCategoryController implements Initializable{
     @FXML
     TextField categoryName;
 
-    private static List<TreeItem<String>> parentsList = new ArrayList<>();
-    private static TreeItem<String>categories;
-    static List<String> mainCategoryNames = new ArrayList<>();
+    public static List<String> mainCategoryNames = new ArrayList<>();
     private TreeItem<String> selectedItem;
     public static String chosenCategory;
     public static String selcectedItemMainCategory;
@@ -35,8 +35,8 @@ public class ChooseCategoryController implements Initializable{
         loadCategories();
         
         categoryView.setContextMenu(CreateContextMenu());
-        categoryView.setRoot(categories);
-        categories.setExpanded(true);
+        categoryView.setRoot(rootCategories);
+        rootCategories.setExpanded(true);
         categoryView.setShowRoot(false);
         categoryName.setVisible(false);
         addCategoryNameBttn.setVisible(false);
@@ -83,7 +83,7 @@ public class ChooseCategoryController implements Initializable{
         if (e.getButton() == MouseButton.PRIMARY) {
             selectedItem = categoryView.getSelectionModel().getSelectedItem();
             
-            if (selectedItem != null && !parentsList.contains(selectedItem)) {
+            if (selectedItem != null) {
                 chosenCategory = selectedItem.getValue();
                 
                 Stage stage = createAddNewProductStage();
@@ -122,6 +122,14 @@ public class ChooseCategoryController implements Initializable{
                 return "AddProduct";
         }
     }
+    private String getMainCategoryOfSelectedProduct(TreeItem<String> item){
+        String category = "";
+        while(!item.getParent().getValue().equals("Categories")){
+            category = item.getParent().getValue();
+            item = item.getParent();
+        }
+        return category;
+    }
     private Scene CreateScene(String fileName) throws IOException{
         URL url = new File("Main/src/Scenes/AdminScenes/" + fileName + ".fxml").toURI().toURL();
         Parent root = FXMLLoader.load(url);
@@ -133,123 +141,48 @@ public class ChooseCategoryController implements Initializable{
         selectedItem = categoryView.getSelectionModel().getSelectedItem();
         TreeItem<String> newItem = new TreeItem<String>(categoryName.getText());
 
-        parentsList.add(selectedItem);
         if (selectedItem == null) {
-            categories.getChildren().add(newItem);
-            parentsList.add(newItem);
+            rootCategories.getChildren().add(newItem);
+            mainCategoryNames.add(categoryName.getText());
         } else{
             selectedItem.getChildren().add(newItem);
+            addNewCategoryToDB(categoryName.getText(), newItem);
         }
-
+        hideControls();
+        
+        getMainCategories();
+        saveAndLoadCategoriesFromNewFile();
+    } 
+    private void addNewCategoryToDB(String name, TreeItem<String>item){
+        Category newCategory = new Category(getIdOfMainCategory(getMainCategoryOfSelectedProduct(item)), selectedItem.getValue(), name);
+        AllChildCategories.childCategories.add(newCategory);
+    }
+    private int getIdOfMainCategory(String mainCat){
+        for (Map.Entry<Integer, TreeItem<String>> category : addedCategories.entrySet()) {
+            String nameOfCurrentCat = category.getValue().getValue(); 
+            if (nameOfCurrentCat.equals(mainCat)) {
+                return category.getKey();
+            }
+        }
+        return 0;
+    }
+    private void hideControls(){
         categoryName.setVisible(false);
         categoryName.setText("");
         addCategoryNameBttn.setVisible(false);
-
-        saveAndLoadCategoriesFromNewFile();
-       
-        getMainCategories();
     }
-    private String getMainCategoryOfSelectedProduct(TreeItem<String> item){
-        String category = "";
-        while(!item.getParent().getValue().equals("Categories")){
-            category = item.getParent().getValue();
-            item = item.getParent();
-        }
-        return category;
-    }
-    private static void removeEndNodes(){
-        for (int i = 0; i < parentsList.size(); i++) {
-            if (parentsList.get(i).getChildren().isEmpty()) {
-                parentsList.remove(parentsList.get(i));
-                i--;
-            }
-        }
-    }
-    private static List<TreeItem<String>> getChildrenNodes(HashMap<String, String> hMap, String parent)
-    {
-        ArrayList<TreeItem<String>> children = new ArrayList<>();
-        TreeItem<String> newChild = new TreeItem<>();
-
-        for (Map.Entry<String, String> entry : hMap.entrySet()) {
-            if(entry.getValue().equals(parent)) {
-                newChild = new TreeItem<>(entry.getKey());
-                newChild.getChildren().addAll(getChildrenNodes(hMap, entry.getKey()));
-
-                parentsList.add(newChild);
-                children.add(newChild);
-            }
-        }
-        return children;
-    } 
     private void saveAndLoadCategoriesFromNewFile(){
-        File f = new File("tree_structure.txt");
-        f.delete();
-    
-        saveCategories(categories, "root");
-        loadCategories();
-        
-    }private void saveCategories(TreeItem<String> root, String parent) {
-        try(PrintWriter writer = new PrintWriter(createFileAndOutputStream())){
-            
-            writer.println(root.getValue() + "=" + parent);
-            
-            for(TreeItem<String> child: root.getChildren()){
-                if(child.getChildren().isEmpty()){
-                    writer.println(child.getValue() + "=" + root.getValue());
-                } else {
-                    saveCategories(child, child.getParent().getValue());
-                }
-            }
-        } catch (FileNotFoundException e) {
-            alert.setContentText("Could not find the save file");
-            alert.show();
-            return;
-        }
+        saveMainCategories(mainCategoryNames);
+        saveCategories();
     }
-    private FileOutputStream createFileAndOutputStream() throws FileNotFoundException{
-        
-        File saveFile = new File("tree_structure.txt");
-        FileOutputStream saveFileOutputStream = new FileOutputStream(saveFile, true);
-        
-        return saveFileOutputStream;
-    }
-    private void loadCategories(){
-        categories = new TreeItem<>("Categories");
-        HashMap<String, String> data = new HashMap<>();
 
-        File file = new File("tree_structure.txt");
-
-        try(BufferedReader br = new BufferedReader(new FileReader(file)))
-        {
-            String st;
-            while((st=br.readLine()) != null) {
-                String[] splitLine = st.split("=");
-                data.put(splitLine[0], splitLine[1]);
-            }
-
-            getChildrenNodesAndToParent(data);
-
-            removeEndNodes();
-            getMainCategories();
-        } catch (IOException ex) {
-            alert.setContentText("Could not load save");
-            alert.show();
-        }
-    }
-    private void getChildrenNodesAndToParent(HashMap<String,String> data){
-        if (data.size() > 0) {
-            List<TreeItem<String>> parents = getChildrenNodes(data, categories.getValue().toString());
-            categories.getChildren().addAll(parents);
-        }
-    }
     private void getMainCategories(){
         mainCategoryNames.clear();
 
-        for (TreeItem<String> name : categories.getChildren()) {
+        for (TreeItem<String> name : rootCategories.getChildren()) {
             if (name.getParent().getValue().equals("Categories")) {
                 mainCategoryNames.add(name.getValue());
             }
         }
     }
-   
 }

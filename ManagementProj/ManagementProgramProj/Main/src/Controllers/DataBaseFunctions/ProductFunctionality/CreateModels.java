@@ -3,7 +3,7 @@ package Controllers.DataBaseFunctions.ProductFunctionality;
 import java.sql.*;
 import Models.*;
 
-public abstract class CreateModels {
+public interface CreateModels {
     public static ProductModel createClothesProductModel(ResultSet rs) throws SQLException{
         ProductModel currentProduct= new ClothesModel(rs.getInt("id"), 
                                                     rs.getString("name"), 

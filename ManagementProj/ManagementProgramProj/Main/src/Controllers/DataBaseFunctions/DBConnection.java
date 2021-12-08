@@ -2,19 +2,15 @@ package Controllers.DataBaseFunctions;
 
 import java.util.*;
 import java.sql.*;
-
-import Controllers.DataBaseFunctions.ProductFunctionality.CreateModels;
-
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
-
-public class DBConnection extends CreateModels{
+public class DBConnection {
     private final static DBConnection connection = new DBConnection();
+
     private Alert alert = new Alert(AlertType.WARNING);
     private Connection dbConnection;
-    
+
     private DBConnection() {
-    
     }
     public void connectToDataBase(){
         try {
@@ -38,5 +34,3 @@ public class DBConnection extends CreateModels{
         return connection.dbConnection;
     }
 }
-
-

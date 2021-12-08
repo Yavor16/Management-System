@@ -2,12 +2,12 @@ package Controllers.DataBaseFunctions.ProductFunctionality;
 
 import java.sql.*;
 
-import static Controllers.DataBaseFunctions.DBConnection.*;
+import Controllers.DataBaseFunctions.DBConnection;
 import Models.ProductModel;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 
-public class GetProduct extends CreateModels{
+public class GetProduct implements CreateModels{
     public static ProductModel wantedProd;
     private static Alert alert = new Alert(AlertType.WARNING);
 
@@ -20,13 +20,13 @@ public class GetProduct extends CreateModels{
             while (rs.next()) {
                 String category = rs.getString(9); 
                 if (category.equals("Technology")) {
-                    wantedProd = createTechnologyProductModel(rs);
+                    wantedProd = CreateModels.createTechnologyProductModel(rs);
                 } else if(category.equals("Food")){
-                    wantedProd = createFoodProductModel(rs);
+                    wantedProd = CreateModels.createFoodProductModel(rs);
                 } else if(category.equals("Clothes")){
-                    wantedProd = createClothesProductModel(rs);
+                    wantedProd = CreateModels.createClothesProductModel(rs);
                 } else{
-                    wantedProd = createProductModel(rs);
+                    wantedProd = CreateModels.createProductModel(rs);
                 }
             }
         } catch (SQLException e) {
@@ -36,10 +36,10 @@ public class GetProduct extends CreateModels{
         }
     }
     private static ResultSet getResultsFromDataBase(int id) throws SQLException{
-        getDBConnection().connectToDataBase();
+        DBConnection.getDBConnection().connectToDataBase();
 
         final String SQL = "SELECT * FROM product where id=" + id;
-        Connection dbConnection = getTheConnectionToTheDB(); 
+        Connection dbConnection = DBConnection.getTheConnectionToTheDB(); 
 
         final ResultSet rs = dbConnection.createStatement().executeQuery(SQL);
     
