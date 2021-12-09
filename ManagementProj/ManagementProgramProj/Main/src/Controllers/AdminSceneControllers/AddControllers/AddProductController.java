@@ -2,6 +2,7 @@ package Controllers.AdminSceneControllers.AddControllers;
 
 import Controllers.AdminSceneControllers.*;
 import Controllers.AdminSceneControllers.Categories.ChooseCategoryController;
+import Controllers.AdminSceneControllers.Categories.CreateAddProductScene;
 import javafx.scene.control.*;
 import javafx.fxml.*;
 
@@ -57,7 +58,7 @@ public class AddProductController extends TextFieldsChecks implements Initializa
                                                 category, 
                                                 quantity, 
                                                 price);
-        pModel.SetMainCategory(ChooseCategoryController.selcectedItemMainCategory);
+        pModel.SetMainCategory(CreateAddProductScene.selectedItemMainCategory);
         return pModel;
     }
     
@@ -69,14 +70,14 @@ public class AddProductController extends TextFieldsChecks implements Initializa
         AllProducts.getProducts();
 
         int id = 0;
-        if (!AllProducts.products.isEmpty()) {            
-            Object key = AllProducts.products.keySet().toArray()[AllProducts.products.size() - 1]; 
+        if (!AllProducts.products.isEmpty()) {    
+            int indexOfLastProduct = AllProducts.products.size() - 1;
+            Object key = AllProducts.products.keySet().toArray()[indexOfLastProduct]; 
             id = AllProducts.products.get(key).GetID() + 1;
         }
         return id;
     }
     protected void addProductToDB(ProductModel pModel){
-    
         AllProducts.getProducts();
 
         if (isNewTheProductInList(nameText.getText())) {
@@ -84,18 +85,6 @@ public class AddProductController extends TextFieldsChecks implements Initializa
             alert.show();
         } else{   
             addNewProductToDB(pModel);
-            ProductModel newModel = new ProductModel(getIndexToAddNewProduct() - 1, 
-                                                        nameText.getText(), 
-                                                        ChooseCategoryController.chosenCategory, 
-                                                        quantity, 
-                                                        price);
-
-            AdminMainSceneController.products.add(newModel);
-
-            alert.setTitle("New product");
-            alert.setHeaderText("");
-            alert.setContentText("Product added!");
-            alert.show();
         }          
     }
     
@@ -103,7 +92,7 @@ public class AddProductController extends TextFieldsChecks implements Initializa
         int arrSize = AdminMainSceneController.products.size();
         for (int i = 0; i < arrSize; i++) {
 
-            ProductModel currentProduct = AdminMainSceneController.products.get(i) ; 
+            ProductModel currentProduct = AdminMainSceneController.products.get(i); 
 
             if (currentProduct.GetName().equals(searchedName)) {
                 return true;

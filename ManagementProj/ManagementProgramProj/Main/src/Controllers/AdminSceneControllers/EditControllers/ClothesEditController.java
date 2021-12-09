@@ -32,7 +32,6 @@ public class ClothesEditController extends EditProductController{
             Stage stage = (Stage)((Node)e.getSource()).getScene().getWindow();
             stage.close();
         }
-        
     }
     @Override
     protected java.lang.Boolean areAllInputsValid() {

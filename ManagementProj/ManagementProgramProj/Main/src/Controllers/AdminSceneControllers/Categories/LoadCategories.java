@@ -8,17 +8,17 @@ import javafx.scene.control.TreeItem;
 
 public abstract class LoadCategories {
     protected static TreeMap<Integer, TreeItem<String>> addedCategories = new TreeMap<>();
-    protected static List<TreeItem<String>> parentCateogories = new ArrayList<>();
 
     protected static TreeItem<String> rootCategories = new TreeItem<>("Categories");
 
     protected static void loadCategories(){
-        AllChildCategories.getChildrenCategories();
+        getAndLoadMainCategories();
 
-       getAndLoadMainCategories();
     }
     private static void getAndLoadMainCategories(){
         AllMainCategories.getMainCategories();
+        AllChildCategories.getChildrenCategories();
+
         rootCategories.getChildren().clear();
 
         for (Map.Entry<Integer,String> category : AllMainCategories.mainCategories.entrySet()) {
@@ -35,7 +35,7 @@ public abstract class LoadCategories {
         TreeItem<String> newChild = new TreeItem<>();
 
         for (Category currentCategory : AllChildCategories.childCategories) {
-            if(currentCategory.getMainCategoryId() == mainId && currentCategory.getParentCategoryId().equals(parent)) {
+            if(currentCategory.getMainCategoryId() == mainId && currentCategory.getParentCategoryName().equals(parent)) {
                 newChild = new TreeItem<>(currentCategory.getChildCategory());
                 children.add(newChild);
 

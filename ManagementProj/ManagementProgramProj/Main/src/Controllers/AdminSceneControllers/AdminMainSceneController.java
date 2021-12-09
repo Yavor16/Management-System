@@ -8,7 +8,8 @@ import javafx.fxml.*;
 import java.util.*;
 
 import static Controllers.DataBaseFunctions.ProductFunctionality.DeleteProductFromDB.*;
-import static Controllers.AdminSceneControllers.Categories.ChooseCategoryController.*;
+
+import Controllers.DataBaseFunctions.CategoryFunctions.MainCategories.AllMainCategories;
 import Controllers.DataBaseFunctions.ProductFunctionality.*;
 
 import java.net.*;
@@ -54,7 +55,7 @@ public class AdminMainSceneController implements Initializable{
 
     @Override 
     public void initialize(URL url, ResourceBundle rb ){
-
+        
         products = FXCollections.observableArrayList();
         searchComboBox.setValue("All products");
         
@@ -77,8 +78,6 @@ public class AdminMainSceneController implements Initializable{
         }
     }
     private static void refreshProducts() {
-        
-        products = FXCollections.observableArrayList();
         AllProducts.getProducts();
         products.clear();
         for(var prod : AllProducts.products.entrySet()){
@@ -98,8 +97,9 @@ public class AdminMainSceneController implements Initializable{
         return searchResults;
     }
     private void initializeComboBox() {
+        AllMainCategories.getMainCategories();
 
-        ObservableList<String> comboBoxItems = FXCollections.observableArrayList(mainCategoryNames);
+        ObservableList<String> comboBoxItems = FXCollections.observableArrayList(AllMainCategories.mainCategories.values());
         comboBoxItems.add("All products");
 
         searchComboBox.setItems(comboBoxItems);
@@ -138,6 +138,7 @@ public class AdminMainSceneController implements Initializable{
         chooseAndCreateEditProductScene();
     
         updateTableView();
+        refreshProducts();
 
     }
     private void chooseAndCreateEditProductScene(){

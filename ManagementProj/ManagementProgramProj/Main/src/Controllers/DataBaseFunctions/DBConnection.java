@@ -31,6 +31,7 @@ public class DBConnection {
         return connection;
     }
     public static Connection getTheConnectionToTheDB(){
+        connection.connectToDataBase();
         return connection.dbConnection;
     }
 }

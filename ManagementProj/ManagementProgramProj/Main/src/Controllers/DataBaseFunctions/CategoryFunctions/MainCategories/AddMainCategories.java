@@ -1,7 +1,6 @@
 package Controllers.DataBaseFunctions.CategoryFunctions.MainCategories;
 
 import java.sql.*;
-import java.util.List;
 
 import Controllers.DataBaseFunctions.DBConnection;
 import javafx.scene.control.Alert;
@@ -14,12 +13,12 @@ public class AddMainCategories {
     private static int id = 0;
     private static Connection dbConnection;
 
-    public static void addNewMainCatToDB(List<String> mainCat) {
+    public static void addNewMainCatToDB() {
         try {
             tryToConnectToDB();
             resetTableAndVariables();
             
-            insertCategories(mainCat);
+            insertCategories();
             
         } catch (SQLException e) {
             alert.setContentText("Cannot add maincategory to database");
@@ -35,9 +34,9 @@ public class AddMainCategories {
         pst.executeUpdate();
         id = 1;
     }
-    private static void insertCategories(List<String> mainCat) throws SQLException{
+    private static void insertCategories() throws SQLException{
         prepareInsertStatement();
-        for (String cat : mainCat) {
+        for (String cat : AllMainCategories.mainCategories.values()) {
             setVarValues(cat);
             pst.executeUpdate();
         }

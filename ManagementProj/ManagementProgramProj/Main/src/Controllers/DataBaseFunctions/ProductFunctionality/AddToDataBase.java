@@ -20,6 +20,11 @@ public class AddToDataBase {
             checkWhichProdToAdd(pm);
             
             pst.executeUpdate();
+            
+            alert.setTitle("New product");
+            alert.setHeaderText("");
+            alert.setContentText("Product added!");
+            alert.show();    
         } catch (SQLException e) {
             alert.setContentText("Cannot add product to database");
             alert.show();
