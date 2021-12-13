@@ -2,13 +2,16 @@ package Controllers;
 
 import static Controllers.ManageBills.*;
 import javafx.scene.control.*;
+import javafx.scene.control.Alert.AlertType;
+
 import java.util.*;
 import java.io.*;
 
 import javafx.scene.layout.VBox;
 
 public class SaveAndLoadHistory {
-
+    private static Alert alert = new Alert(AlertType.ERROR);
+    
     public static void SaveFile(){
         if (!bills.isEmpty() ) {
             try{
@@ -36,7 +39,9 @@ public class SaveAndLoadHistory {
                 bw.close();
                 
             } catch(IOException e){
-                System.out.println(e);
+                alert.setHeaderText("");
+                alert.setContentText("Cannot save your history");
+                alert.show();
             }
         }
     }
@@ -59,7 +64,9 @@ public class SaveAndLoadHistory {
             }
             br.close();
         } catch(IOException e){
-            System.out.println(e);
+            alert.setHeaderText("");
+            alert.setContentText("Cannot load your history");
+            alert.show();
         }
     }
 }

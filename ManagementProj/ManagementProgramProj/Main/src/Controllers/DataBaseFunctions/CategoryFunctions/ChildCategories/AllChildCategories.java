@@ -1,11 +1,9 @@
 package Controllers.DataBaseFunctions.CategoryFunctions.ChildCategories;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.Map;
+import java.util.*;
 
 import Controllers.DataBaseFunctions.DBConnection;
-import Controllers.DataBaseFunctions.CategoryFunctions.MainCategories.AllMainCategories;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 
@@ -38,22 +36,14 @@ public class AllChildCategories {
         return rs;
     }
     private static Category createCategory(ResultSet rs) throws SQLException{
+        int categoryId = rs.getInt("id");
         int maincategoryId = rs.getInt("maincategory_id");
-        String mainCategoryName = getMainCatagoryName(maincategoryId);
-        String parentCategoryId = rs.getString("parentcategory_name");
+        int parentCategoryId = rs.getInt("parentcategory_id");
         String childCategory = rs.getString("childcategory");
 
 
-        Category newCategory = new Category(maincategoryId, mainCategoryName ,parentCategoryId,childCategory);
+        Category newCategory = new Category(categoryId, maincategoryId, parentCategoryId,childCategory);
 
         return newCategory;
     }
-    private static String getMainCatagoryName(int id){
-        for (Map.Entry<Integer, String> categ : AllMainCategories.mainCategories.entrySet()) {
-            if (categ.getKey() == id) {
-                return categ.getValue();
-            }
-        }
-        return "";
-    }   
 }

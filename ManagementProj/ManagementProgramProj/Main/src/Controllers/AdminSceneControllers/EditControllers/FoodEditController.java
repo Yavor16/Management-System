@@ -3,8 +3,7 @@ package Controllers.AdminSceneControllers.EditControllers;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-import Models.ProductModel;
-import Models.VegetangleFruitModel;
+import Models.*;
 import javafx.event.ActionEvent;
 import javafx.stage.Stage;
 import javafx.scene.Node;

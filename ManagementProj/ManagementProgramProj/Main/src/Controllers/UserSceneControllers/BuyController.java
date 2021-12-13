@@ -41,7 +41,6 @@ public class BuyController implements Initializable{
     @FXML
     Label totalMoneyLabel;
 
-
     private static Alert alert = new Alert(AlertType.INFORMATION);
     public ProductModel selectedProduct;
     public static int amountToBuy;
@@ -99,11 +98,22 @@ public class BuyController implements Initializable{
       
         AllProducts.getProducts();
         
+        buyAllProductsFromBasket();
+        
+        addNewBill(productsToBuy);
+        
+        callAlert("Order is completed!", "Success");
+        MainScene.isOrderedComplete = true;
+        
+        Stage stage = (Stage)((Node)e.getSource()).getScene().getWindow();
+        stage.close();
+    }
+    private void buyAllProductsFromBasket(){
         ItemToBuyModel currentProd;
         ProductModel productFromDataBase;
         
         int listSize = productsToBuy.size();
-        
+
         for (int i = 0; i < listSize; i++) {   
             currentProd = productsToBuy.get(i);
             productFromDataBase = AllProducts.products.get(currentProd.GetProduct().GetID());
@@ -119,12 +129,6 @@ public class BuyController implements Initializable{
                 deleteProductFromDB(currentProd.GetProduct().GetID());
             }
         }
-        addNewBill(productsToBuy);
-        
-        callAlert("Order is completed!", "Success");
-
-        Stage stage = (Stage)((Node)e.getSource()).getScene().getWindow();
-        stage.close();
     }
     private void callAlert(String message, String title){
         alert.setTitle(title);

@@ -11,7 +11,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
 public class ManageBills {
-    public static Queue<VBox> bills = new LinkedList<>();
+    public static Queue<VBox> bills = new ArrayDeque<>();
     private static int MAX_BILLS_AMOUNT = 10;
 
     public static void createBill(String date,  List<String> products){
@@ -24,7 +24,7 @@ public class ManageBills {
             tf.setText(prod);
             vb.getChildren().add(tf);
         }
-        bills.add(vb);
+        bills.offer(vb);
     }
     private static VBox createVBoxForNewBill(String date){
         VBox vb = new VBox();
@@ -46,11 +46,9 @@ public class ManageBills {
         VBox newVBox = createVBoxForNewBill(productsToBuy);
         
         if (bills.size() >= MAX_BILLS_AMOUNT) {
-            bills.remove();
-            bills.add(newVBox);
-        } else{
-            bills.add(newVBox);
-        }
+            bills.peek();
+        } 
+        bills.offer(newVBox);
     }
     private static VBox createVBoxForNewBill(ObservableList<ItemToBuyModel>productsToBuy){
         VBox vb = new VBox();

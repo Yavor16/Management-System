@@ -1,7 +1,6 @@
 package Controllers.AdminSceneControllers.AddControllers;
 
-import Models.ProductModel;
-import Models.VegetangleFruitModel;
+import Models.*;
 import javafx.event.ActionEvent;
 import javafx.scene.Node;
 import javafx.stage.Stage;

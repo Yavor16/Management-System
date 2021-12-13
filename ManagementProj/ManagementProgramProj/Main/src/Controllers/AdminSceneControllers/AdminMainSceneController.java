@@ -164,7 +164,7 @@ public class AdminMainSceneController implements Initializable{
     }
     private Scene createScene(String fileName) {
         try{
-            url = new File("Main/src/Scenes/AdminScenes/" + fileName + ".fxml").toURI().toURL();
+            url = new File("Main/src/Views/AdminScenes/" + fileName + ".fxml").toURI().toURL();
             root = FXMLLoader.load(url);
             
             scene = new Scene(root);
@@ -198,7 +198,7 @@ public class AdminMainSceneController implements Initializable{
     public void CloseWindow(ActionEvent e) {
 
         try {
-            url = new File("Main/src/Scenes/OpenScene.fxml").toURI().toURL();
+            url = new File("Main/src/Views/OpenScene.fxml").toURI().toURL();
             root = FXMLLoader.load(url);
         } catch (IOException exe) {
             alert.setContentText("Cannot open the scene");

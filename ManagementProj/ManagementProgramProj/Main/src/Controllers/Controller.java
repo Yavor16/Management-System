@@ -50,7 +50,7 @@ public class Controller implements Initializable{
     }
     private void createNewScene(ActionEvent e, String sceneName){
         try {
-            URL url = new File("Main/src/Scenes/" + sceneName + ".fxml").toURI().toURL();
+            URL url = new File("Main/src/Views/" + sceneName + ".fxml").toURI().toURL();
             root = FXMLLoader.load(url);
 
             stage = (Stage)((Node )e.getSource()).getScene().getWindow();

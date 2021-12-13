@@ -1,13 +1,11 @@
 package Controllers.AdminSceneControllers.AddControllers;
 
-import Models.ProductModel;
-import Models.TechnologyProductModel;
+import javafx.scene.control.*;
+import Models.*;
 import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
-import javafx.scene.Node;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import javafx.scene.Node;
+import javafx.fxml.FXML;
 
 public class AddTechnologyProdController extends AddProductController{
     @FXML

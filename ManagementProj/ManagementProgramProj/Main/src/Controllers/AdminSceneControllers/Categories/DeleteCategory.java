@@ -4,44 +4,46 @@ import java.util.Map;
 
 import Controllers.DataBaseFunctions.CategoryFunctions.ChildCategories.*;
 import Controllers.DataBaseFunctions.CategoryFunctions.MainCategories.AllMainCategories;
+import Controllers.DataBaseFunctions.ProductFunctionality.ClearProducts;
 import javafx.scene.control.TreeItem;
 
 public class DeleteCategory {
     public static void deleteCategory(TreeItem<String> categoryToDel){
-        deleteMainCategory(categoryToDel);
-        deleteChildCategories(categoryToDel);
-        AddCategories.saveMainCategories();
-
-        ResetCategories.resetChildCategories();
+        deleteMainCategoryAndClearProdcuts(categoryToDel);
+        deleteChildCategoriesAndClearProdcuts(categoryToDel);        
     }
-    private static void deleteMainCategory(TreeItem<String> categoryToDel){
+    private static void deleteMainCategoryAndClearProdcuts(TreeItem<String> categoryToDel){
         String nameOfCategory = categoryToDel.getValue();
         int keyOfCategory = getMainCategoryId(nameOfCategory);
 
         if (AllMainCategories.mainCategories.values().contains(nameOfCategory)) {
             AllMainCategories.mainCategories.remove(keyOfCategory);
+            ClearProducts.clearProductsUsingMainCategory(nameOfCategory);
         }
     } 
     private static int getMainCategoryId(String value){
         for (Map.Entry<Integer, String> categ : AllMainCategories.mainCategories.entrySet()) {
             if (categ.getValue().equals(value)) {
+                System.out.println(categ.getKey());
                 return categ.getKey();
             }
         }
         return 0;
     }
-    private static void deleteChildCategories(TreeItem<String> categoryToDel){
+    private static void deleteChildCategoriesAndClearProdcuts(TreeItem<String> categoryToDel){
         
         if (AllMainCategories.mainCategories.values().contains(categoryToDel.getValue()) == false) {
             
             if (categoryToDel.getChildren().size() > 0) {
                 for (int i = 0; i < categoryToDel.getChildren().size(); i++) {
-                    deleteChildCategories(categoryToDel.getChildren().get(i));
+                    deleteChildCategoriesAndClearProdcuts(categoryToDel.getChildren().get(i));
                 }
             }
             Category currentCategory = getSpecificCategory(categoryToDel.getValue());
             AllChildCategories.childCategories.remove(currentCategory);
-        
+
+            String category = currentCategory == null ? "" : currentCategory.getChildCategory();
+            ClearProducts.clearProductsUsingChildCategory(category);
         }
     }
     private static Category getSpecificCategory(String catNameString){

@@ -1,6 +1,7 @@
 package Controllers.DataBaseFunctions.CategoryFunctions.MainCategories;
 
 import java.sql.*;
+import java.util.Map;
 
 import Controllers.DataBaseFunctions.DBConnection;
 import javafx.scene.control.Alert;
@@ -10,7 +11,7 @@ public class AddMainCategories {
 
     private static PreparedStatement pst;
     private static Alert alert = new Alert(AlertType.WARNING);
-    private static int id = 0;
+
     private static Connection dbConnection;
 
     public static void addNewMainCatToDB() {
@@ -32,12 +33,11 @@ public class AddMainCategories {
     private static void resetTableAndVariables() throws SQLException{
         pst = dbConnection.prepareStatement("truncate maincategories");
         pst.executeUpdate();
-        id = 1;
     }
     private static void insertCategories() throws SQLException{
         prepareInsertStatement();
-        for (String cat : AllMainCategories.mainCategories.values()) {
-            setVarValues(cat);
+        for (Map.Entry<Integer,String> cat : AllMainCategories.mainCategories.entrySet()) {
+            setVarValues(cat.getKey(), cat.getValue());
             pst.executeUpdate();
         }
     }
@@ -46,7 +46,7 @@ public class AddMainCategories {
                                             "maincategories(mainc_id,maincategories)" + 
                                             "values(?,?)");   
     }
-    private static void setVarValues(String mainCat) throws SQLException {
+    private static void setVarValues(int id ,String mainCat) throws SQLException {
         pst.setInt(1, id);
         pst.setString(2, mainCat);
 

@@ -3,8 +3,7 @@ package Controllers.AdminSceneControllers.EditControllers;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-import Models.ProductModel;
-import Models.TechnologyProductModel;
+import Models.*;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -28,8 +27,8 @@ public class TechnolofyEditController extends EditProductController{
     }
     @Override
     public void UpdateProduct(ActionEvent e) {
-        setVariablesValues();
         if(areAllInputsValid()){
+            setVariablesValues();
             ProductModel newModel = createNewModelForUpdate();
             updateProduct(newModel);
 

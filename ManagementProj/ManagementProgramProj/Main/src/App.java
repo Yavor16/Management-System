@@ -27,7 +27,7 @@ public class App extends Application {
     }
     private void openFirstScene(Stage stage){
         try{
-            Parent root = FXMLLoader.load(getClass().getResource("./Scenes/OpenScene.fxml"));
+            Parent root = FXMLLoader.load(getClass().getResource("./Views/OpenScene.fxml"));
             Scene scene = new Scene(root);
             stage.setTitle("Management System");
             stage.setScene(scene);
@@ -35,7 +35,7 @@ public class App extends Application {
         } catch(IOException e){
             Alert alert = new Alert(AlertType.ERROR);
             alert.setTitle("Error");
-            alert.setContentText(e.getMessage());
+            alert.setContentText("Cannot open the main scene");
             alert.show();
         }
     }

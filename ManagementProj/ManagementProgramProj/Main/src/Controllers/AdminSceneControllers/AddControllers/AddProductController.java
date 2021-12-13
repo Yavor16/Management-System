@@ -1,8 +1,7 @@
 package Controllers.AdminSceneControllers.AddControllers;
 
+import Controllers.AdminSceneControllers.Categories.*;
 import Controllers.AdminSceneControllers.*;
-import Controllers.AdminSceneControllers.Categories.ChooseCategoryController;
-import Controllers.AdminSceneControllers.Categories.CreateAddProductScene;
 import javafx.scene.control.*;
 import javafx.fxml.*;
 

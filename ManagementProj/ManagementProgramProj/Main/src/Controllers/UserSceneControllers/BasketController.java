@@ -32,7 +32,7 @@ public class BasketController implements Initializable{
     }
     
     public void OpenBuyScene(ActionEvent e) throws IOException{
-        URL url = new File("Main/src/Scenes/UserScenes/BuyScene.fxml").toURI().toURL();
+        URL url = new File("Main/src/Views/UserScenes/BuyScene.fxml").toURI().toURL();
         Parent root = FXMLLoader.load(url);
         
         Scene scene = new Scene(root);
@@ -43,6 +43,5 @@ public class BasketController implements Initializable{
         
         stage = (Stage)((Node)e.getSource()).getScene().getWindow();
         stage.close();
-
     }
 }

@@ -1,17 +1,13 @@
 package Controllers.AdminSceneControllers.Categories;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
+import javafx.scene.control.*;
+import javafx.stage.*;
+import javafx.scene.*;
+import java.io.*;
 
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.TreeItem;
 import javafx.scene.control.Alert.AlertType;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
+import javafx.fxml.FXMLLoader;
+import java.net.URL;
 
 public class CreateAddProductScene {
     private Alert alert = new Alert(AlertType.ERROR);
@@ -27,7 +23,6 @@ public class CreateAddProductScene {
                 
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.showAndWait();  
-
     }
     private Stage createAddNewProductStage(){
         Stage stage = new Stage();
@@ -42,7 +37,7 @@ public class CreateAddProductScene {
         return stage;
     }
     private String getWhichSceneToCreate(){
-        selectedItemMainCategory = AddCategories.getMainCategoryOfSelectedProduct(selectedItem);
+        selectedItemMainCategory = GetMainCategory.getMainCategoryOfSelectedProduct(selectedItem);
 
         switch (selectedItemMainCategory) {
             case "Technology":
@@ -56,7 +51,7 @@ public class CreateAddProductScene {
         }
     }
     private Scene CreateScene(String fileName) throws IOException{
-        URL url = new File("Main/src/Scenes/AdminScenes/" + fileName + ".fxml").toURI().toURL();
+        URL url = new File("Main/src/Views/AdminScenes/" + fileName + ".fxml").toURI().toURL();
         Parent root = FXMLLoader.load(url);
         Scene scene = new Scene(root);
 

@@ -30,6 +30,8 @@ public class MainScene implements Initializable{
     GridPane productsGrid;
 
     public static Map<ProductModel, Integer> basketItems;
+    public static boolean isOrderedComplete = false;
+    
     private ProductInfoController pInfoController;
     private Alert alert = new Alert(AlertType.ERROR);
     private URL url;
@@ -92,7 +94,7 @@ public class MainScene implements Initializable{
         SaveAndLoadHistory.SaveFile();
     
         try {
-            url = new File("Main/src/Scenes/OpenScene.fxml").toURI().toURL();
+            url = new File("Main/src/Views/OpenScene.fxml").toURI().toURL();
             FXMLLoader loader = new FXMLLoader(url);
             root = loader.load();
             
@@ -112,16 +114,19 @@ public class MainScene implements Initializable{
     public void OpenBasket(ActionEvent e) {
         createScene("UserScenes/BoxScene");
 
-        basketItems.clear();
-        productsGrid.getChildren().clear();
-        
-        updateDataStructures();
-        searchProductFromTable();
-        updateTilePane();
+        if (isOrderedComplete) {
+            basketItems.clear();
+            productsGrid.getChildren().clear();
+            
+            updateDataStructures();
+            updateTilePane();
+            
+            isOrderedComplete = false;
+        }
     }
     private void createScene(String name) {
         try {
-            url = new File("Main/src/Scenes/" + name +".fxml").toURI().toURL();
+            url = new File("Main/src/Views/" + name +".fxml").toURI().toURL();
             FXMLLoader loader = new FXMLLoader(url);
             root = loader.load();
             
@@ -143,24 +148,24 @@ public class MainScene implements Initializable{
         int row = 0, col=0;
         int amountOfBoxed;
 
-            amountOfBoxed = sortedResultFromSearch.size();
-            
-            for (int i = 0; i < amountOfBoxed; i++) {
-                if (col ==3 ) {
-                    col =0;
-                    row++;
-                }
-                
-                createProductsInfoSceneAndGetController();
-                pInfoController.setData(sortedResultFromSearch.get(i));
-                
-                productsGrid.add(root,col ,row);
-                col++;
+        amountOfBoxed = sortedResultFromSearch.size();
+        
+        for (int i = 0; i < amountOfBoxed; i++) {
+            if (col ==3 ) {
+                col =0;
+                row++;
             }
+            
+            createProductsInfoSceneAndGetController();
+            pInfoController.setData(sortedResultFromSearch.get(i));
+            
+            productsGrid.add(root,col ,row);
+            col++;
+        }
     }
     private void createProductsInfoSceneAndGetController() {
         try {
-            url = new File("Main/src/Scenes/UserScenes/ProductInfoBox.fxml").toURI().toURL();
+            url = new File("Main/src/Views/UserScenes/ProductInfoBox.fxml").toURI().toURL();
             FXMLLoader loader = new FXMLLoader(url);
             root = loader.load();
             pInfoController = loader.getController();

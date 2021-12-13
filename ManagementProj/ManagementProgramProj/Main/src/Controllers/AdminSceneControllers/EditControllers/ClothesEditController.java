@@ -3,8 +3,7 @@ package Controllers.AdminSceneControllers.EditControllers;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-import Models.ClothesModel;
-import Models.ProductModel;
+import Models.*;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;

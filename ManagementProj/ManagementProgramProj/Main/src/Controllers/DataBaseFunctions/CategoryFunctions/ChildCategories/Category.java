@@ -1,36 +1,27 @@
 package Controllers.DataBaseFunctions.CategoryFunctions.ChildCategories;
 
 public class Category {
-    private int mainCategoryId;
-    private final String mainCategoryName;
-    private String parentCategoryName;
-    private String childCategory;
+    private final int categoriId;
+    private final int mainCategoryId;
+    private final int parentCategoryId;
+    private final String childCategory;
 
-    public Category(int maincategoryId, String mainCategoryName ,String parentCategoryName, String childCategory) {
+    public Category(int id, int maincategoryId ,int parentCategoryId, String childCategory) {
+        this.categoriId = id;
         this.mainCategoryId = maincategoryId;
-        this.mainCategoryName = mainCategoryName;
         this.childCategory = childCategory;
-        this.parentCategoryName = parentCategoryName;
+        this.parentCategoryId = parentCategoryId;
     }
-    public String getMainCategoryName() {
-        return mainCategoryName;
+    public int getCategoriId() {
+        return categoriId;
     }
     public int getMainCategoryId() {
         return mainCategoryId;
     }
-    public String getParentCategoryName() {
-        return parentCategoryName;
+    public int getParentCategoryId() {
+        return parentCategoryId;
     }
     public String getChildCategory() {
         return childCategory;
-    }
-    public void setMainCategoryId(int maincategoryId) {
-        this.mainCategoryId = maincategoryId;
-    }
-    public void setParentCategoryName(String parentCategoryId) {
-        this.parentCategoryName = parentCategoryId;
-    }
-    public void setChildCategory(String childCategory) {
-        this.childCategory = childCategory;
     }
 }

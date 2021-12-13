@@ -3,9 +3,12 @@ package Controllers.AdminSceneControllers.Categories;
 import java.net.URL;
 import java.util.*;
 
+import Controllers.DataBaseFunctions.ProductFunctionality.AllProducts;
+
 import java.io.*;
 
 import javafx.scene.control.*;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.input.*;
 import javafx.event.*;
 import javafx.fxml.*;
@@ -38,15 +41,24 @@ public class ChooseCategoryController extends LoadCategories implements Initiali
     private ContextMenu CreateContextMenu(){
         ContextMenu contextMenu = new ContextMenu();
         
-        MenuItem addMenuItem = new MenuItem("Add Category");
-        MenuItem deleteMenuItem = new MenuItem("Delete Category");
+        contextMenu.getItems().addAll(createAddCateogoryMenuItem(), createDeleteCateogoryMenuItem());
         
+        return contextMenu;
+    }
+    private MenuItem createAddCateogoryMenuItem(){
+        MenuItem addMenuItem = new MenuItem("Add Category");
+
         addMenuItem.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e){
                 switchControlsVisibilty();
             } 
         });
+    
+        return addMenuItem;
+    }
+    private MenuItem createDeleteCateogoryMenuItem(){
+        MenuItem deleteMenuItem = new MenuItem("Delete Category");
         deleteMenuItem.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e){
@@ -54,11 +66,11 @@ public class ChooseCategoryController extends LoadCategories implements Initiali
                 DeleteCategory.deleteCategory(selectedItem);
                 saveAndLoadCategoriesFromNewFile();
                 loadCategories();
+                AllProducts.getProducts();
             } 
         });
-        contextMenu.getItems().addAll(addMenuItem, deleteMenuItem);
-        
-        return contextMenu;
+
+        return deleteMenuItem;
     }
     public void SelectItem(MouseEvent e) throws IOException{
         if (e.getButton() == MouseButton.PRIMARY) {
@@ -81,9 +93,20 @@ public class ChooseCategoryController extends LoadCategories implements Initiali
     public void AddCategoryName(ActionEvent e) {
         selectedItem = categoryView.getSelectionModel().getSelectedItem();
         String newCategoryName = categoryName.getText();
-
+        
+        if (AddCategories.canAddNewCategory(newCategoryName)) {
+            
+            createAndAddNewCategory(newCategoryName);
+            
+            switchControlsVisibilty();
+            saveAndLoadCategoriesFromNewFile();
+        } else{
+            createAlertForExistingCategory();
+        }
+    } 
+    private void createAndAddNewCategory(String newCategoryName){
         TreeItem<String> newItem = new TreeItem<String>(newCategoryName);
-
+            
         if (selectedItem == null) {
             rootCategories.getChildren().add(newItem);
             AddCategories.addMainCategory(newCategoryName);
@@ -91,11 +114,7 @@ public class ChooseCategoryController extends LoadCategories implements Initiali
             selectedItem.getChildren().add(newItem);
             AddCategories.addChildCategory(newCategoryName, newItem);
         }
-        
-        switchControlsVisibilty();
-        saveAndLoadCategoriesFromNewFile();
-    } 
-    
+    }
     private void switchControlsVisibilty(){
         if (categoryName.isVisible()) {
             categoryName.setVisible(false);
@@ -105,10 +124,16 @@ public class ChooseCategoryController extends LoadCategories implements Initiali
             categoryName.setVisible(true);
             addCategoryNameBttn.setVisible(true);
         }
-            
     }
     private void saveAndLoadCategoriesFromNewFile(){
         AddCategories.saveMainCategories();
         AddCategories.saveCategories();
+    }
+    private void createAlertForExistingCategory(){
+        Alert alert = new Alert(AlertType.ERROR);
+        alert.setHeaderText("");
+        alert.setContentText("This category already exists!");
+        alert.setTitle("Invalid category name");
+        alert.show();
     }
 }
